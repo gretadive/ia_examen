@@ -297,21 +297,37 @@ def realizar_refuerzo(tema):
     st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
     st.write(subtemas[subtema]["texto"])
 
-    respuestas_refuerzo = []
-    for i, p in enumerate(preguntas_refuerzo):
-        key = f"ref_{i}_{subtema}"
+    # Inicializar el estado de las respuestas si no existe
+    if 'actual_refuerzo' not in st.session_state:
+        st.session_state['actual_refuerzo'] = 0
+        st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+
+    # Mostrar preguntas de refuerzo
+    if st.session_state['actual_refuerzo'] < len(preguntas_refuerzo):
+        p = preguntas_refuerzo[st.session_state['actual_refuerzo']]
+        key = f"ref_refuerzo_{st.session_state['actual_refuerzo']}_{subtema}"
+
         if p["tipo"] == "opcion":
             respuesta = st.radio(p["pregunta"], p["opciones"], key=key)
         elif p["tipo"] == "vf":
             respuesta = st.radio(p["pregunta"], ["V", "F"], key=key)
         elif p["tipo"] == "abierta":
             respuesta = st.text_input(p["pregunta"], key=key)
-        respuestas_refuerzo.append(respuesta)
+        
+        # Guardar la respuesta en el estado de la sesión
+        st.session_state['respuestas_refuerzo'][st.session_state['actual_refuerzo']] = respuesta
 
-    if st.button("✅ Finalizar Refuerzo"):
+        if st.button("Siguiente pregunta"):
+            if respuesta is not None and respuesta != "":
+                st.session_state['actual_refuerzo'] += 1
+            else:
+                st.warning("Por favor responde antes de continuar.")
+
+    # Calcular puntaje de refuerzo al finalizar
+    if st.session_state['actual_refuerzo'] >= len(preguntas_refuerzo):
         puntaje = 0
         for i, p in enumerate(preguntas_refuerzo):
-            r = respuestas_refuerzo[i]
+            r = st.session_state['respuestas_refuerzo'][i]
             if p["tipo"] in ["opcion", "vf"]:
                 if r == p["respuesta"]:
                     puntaje += 1
@@ -321,7 +337,7 @@ def realizar_refuerzo(tema):
 
         st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{len(preguntas_refuerzo)}")
         for i, p in enumerate(preguntas_refuerzo):
-            r = respuestas_refuerzo[i]
+            r = st.session_state['respuestas_refuerzo'][i]
             correcto = False
             if p["tipo"] in ["opcion", "vf"]:
                 correcto = r == p["respuesta"]
@@ -337,6 +353,12 @@ def realizar_refuerzo(tema):
         if puntaje < 3:
             st.warning("📚 Aquí tienes recursos para mejorar:")
             mostrar_recursos(subtema)
+
+        # Reiniciar el estado de refuerzo
+        if st.button("🔄 Reiniciar Refuerzo"):
+            st.session_state['actual_refuerzo'] = 0
+            st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+
 
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
@@ -386,6 +408,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
