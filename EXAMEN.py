@@ -4,6 +4,7 @@ import streamlit as st
 # -------------------------------
 # PREGUNTAS POR NIVEL Y TIPO
 # -------------------------------
+
 niveles = {
     "básico": [
         {
@@ -112,6 +113,7 @@ niveles = {
 # -------------------------------
 # SUBTEMAS Y PREGUNTAS DE REFUERZO
 # -------------------------------
+
 subtemas = {
     "retroalimentación": {
         "texto": "La retroalimentación es un proceso esencial en la educación que permite a los estudiantes conocer su desempeño y áreas de mejora. La retroalimentación efectiva debe ser específica, oportuna y constructiva, ayudando a los estudiantes a entender sus errores y cómo corregirlos. En el contexto de la IA, esta puede proporcionar retroalimentación instantánea, lo que permite a los estudiantes ajustar su aprendizaje en tiempo real.",
@@ -199,13 +201,6 @@ subtemas = {
 # FUNCIONES PARA CADA NIVEL DE EXAMEN
 # -----------------------------------
 
-def main():
-    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
-    st.write("""
-    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
-    👉 Debes responder correctamente al menos 4 de 5 preguntas para avanzar.
-    """)
-    
 def iniciar_examen(nivel):
     st.session_state[f'iniciado_{nivel}'] = True
     if f'preguntas_{nivel}' not in st.session_state:
@@ -299,8 +294,6 @@ def examen_nivel(nivel):
 
     return -1  # aún no termina
 
-
-
 def realizar_refuerzo(tema):
     subtema = "retroalimentación" if tema == "retroalimentación" else "personalización del aprendizaje"
     st.write(f"🔁 Vamos a reforzar el tema: **{subtema.upper()}**")
@@ -363,7 +356,46 @@ def realizar_refuerzo(tema):
             st.error(f"❌ Pregunta {i+1}: Incorrecta")
             st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-    # Botones para iniciar otros niveles
+    # Mostrar recursos si no se aprueba el refuerzo
+    if puntaje_refuerzo < 3:
+        st.warning("❗ No aprobaste el refuerzo. Aquí tienes más recursos:")
+        mostrar_recursos(tema)
+
+    # Mostrar recursos si no se aprueba el refuerzo
+    if puntaje_refuerzo < 3:
+        st.warning("❗ No aprobaste el refuerzo. Aquí tienes más recursos:")
+        mostrar_recursos(tema)
+
+def mostrar_recursos(tema):
+    if tema == "retroalimentación":
+        st.write("📹 Video: [Optimización de Retroalimentación Educativa con IA](https://www.youtube.com/watch?v=ejemplo1)")
+        st.write("📄 PDF: [Guía Completa de Retroalimentación Formativa](https://example.com/retroalimentacion.pdf)")
+    elif tema == "personalización del aprendizaje":
+        st.write("📹 Video: [Personalizando el Aprendizaje con Inteligencia Artificial](https://www.youtube.com/watch?v=ejemplo2)")
+        st.write("📄 PDF: [Manual de Aprendizaje Adaptativo](https://example.com/personalizacion.pdf)")
+
+# -----------------------------------
+# FLUJO PRINCIPAL
+# -----------------------------------
+
+def main():
+    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
+
+    st.write("""
+    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
+
+    👉 Debes responder correctamente al menos 4 de 5 preguntas para avanzar.
+    """)
+
+    # Inicializar estados generales una sola vez
+    for nivel in ["básico", "intermedio", "avanzado"]:
+        st.session_state.setdefault(f'iniciado_{nivel}', False)
+
+    # Selección de tema
+    tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
+    st.session_state['tema_seleccionado'] = tema_seleccionado  # Guardar el tema seleccionado
+
+    # Botones de inicio
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("Iniciar Nivel BÁSICO"):
@@ -381,19 +413,20 @@ def realizar_refuerzo(tema):
             else:
                 st.warning("Debes aprobar el nivel INTERMEDIO primero.")
 
-# Mostrar exámenes si se han iniciado
-if st.session_state.get('iniciado_básico', False):
-    examen_nivel("básico")
-elif st.session_state.get('iniciado_intermedio', False):
-    examen_nivel("intermedio")
-elif st.session_state.get('iniciado_avanzado', False):
-    examen_nivel("avanzado")
+    # Mostrar exámenes si se han iniciado
+    if st.session_state['iniciado_básico']:
+        examen_nivel("básico")
+    elif st.session_state['iniciado_intermedio']:
+        examen_nivel("intermedio")
+    elif st.session_state['iniciado_avanzado']:
+        examen_nivel("avanzado")
 
-# ------------------------------
+# -------------------------------
 # EJECUTAR APP
 # -------------------------------
-if __name__ == "__main__":
-    main()
+main()
+
+
 
 
 
