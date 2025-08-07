@@ -4,7 +4,6 @@ import streamlit as st
 # -------------------------------
 # PREGUNTAS POR NIVEL Y TIPO
 # -------------------------------
-
 niveles = {
     "básico": [
         {
@@ -113,7 +112,6 @@ niveles = {
 # -------------------------------
 # SUBTEMAS Y PREGUNTAS DE REFUERZO
 # -------------------------------
-
 subtemas = {
     "retroalimentación": {
         "texto": "La retroalimentación es un proceso esencial en la educación que permite a los estudiantes conocer su desempeño y áreas de mejora. La retroalimentación efectiva debe ser específica, oportuna y constructiva, ayudando a los estudiantes a entender sus errores y cómo corregirlos. En el contexto de la IA, esta puede proporcionar retroalimentación instantánea, lo que permite a los estudiantes ajustar su aprendizaje en tiempo real.",
@@ -200,7 +198,6 @@ subtemas = {
 # -----------------------------------
 # FUNCIONES PARA CADA NIVEL DE EXAMEN
 # -----------------------------------
-
 def iniciar_examen(nivel):
     st.session_state[f'iniciado_{nivel}'] = True
     if f'preguntas_{nivel}' not in st.session_state:
@@ -355,6 +352,9 @@ def realizar_refuerzo(tema):
         else:
             st.error(f"❌ Pregunta {i+1}: Incorrecta")
             st.info(f"ℹ️ Explicación: {p['explicacion']}")
+
+    # Botones para iniciar otros niveles
+    col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("Iniciar Nivel BÁSICO"):
             iniciar_examen("básico")
@@ -370,17 +370,19 @@ def realizar_refuerzo(tema):
                 iniciar_examen("avanzado")
             else:
                 st.warning("Debes aprobar el nivel INTERMEDIO primero.")
-    # Mostrar exámenes si se han iniciado
-    if st.session_state['iniciado_básico']:
-        examen_nivel("básico")
-    elif st.session_state['iniciado_intermedio']:
-        examen_nivel("intermedio")
-    elif st.session_state['iniciado_avanzado']:
-        examen_nivel("avanzado")
+
+# Mostrar exámenes si se han iniciado
+if st.session_state.get('iniciado_básico', False):
+    examen_nivel("básico")
+elif st.session_state.get('iniciado_intermedio', False):
+    examen_nivel("intermedio")
+elif st.session_state.get('iniciado_avanzado', False):
+    examen_nivel("avanzado")
+
 # -------------------------------
 # EJECUTAR APP
 # -------------------------------
-main()
+if __name__ == "__main__":
+    main()
 
-   
-
+        if st.button
