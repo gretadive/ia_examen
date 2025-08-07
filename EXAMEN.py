@@ -1,4 +1,5 @@
 import random
+import streamlit as st
 
 # -------------------------------
 # PREGUNTAS POR NIVEL Y TIPO
@@ -109,74 +110,222 @@ niveles = {
     ]
 }
 
+# -------------------------------
+# SUBTEMAS Y PREGUNTAS DE REFUERZO
+# -------------------------------
+
+subtemas = {
+    "retroalimentación": {
+        "texto": "La retroalimentación es un proceso esencial en la educación que permite a los estudiantes conocer su desempeño y áreas de mejora. La retroalimentación efectiva debe ser específica, oportuna y constructiva, ayudando a los estudiantes a entender sus errores y cómo corregirlos. En el contexto de la IA, esta puede proporcionar retroalimentación instantánea, lo que permite a los estudiantes ajustar su aprendizaje en tiempo real.",
+        "preguntas": [
+            {
+                "tipo": "opcion",
+                "pregunta": "¿Qué caracteriza a una retroalimentación efectiva?",
+                "opciones": ["A. Ser vaga", "B. Ser específica y constructiva", "C. Ser solo positiva", "D. No ser oportuna"],
+                "respuesta": "B",
+                "explicacion": "La retroalimentación efectiva debe ser específica y constructiva."
+            },
+            {
+                "tipo": "vf",
+                "pregunta": "La retroalimentación instantánea no es útil para el aprendizaje. (V/F)",
+                "respuesta": "F",
+                "explicacion": "La retroalimentación instantánea es muy útil para el aprendizaje."
+            },
+            {
+                "tipo": "abierta",
+                "pregunta": "Menciona un tipo de retroalimentación.",
+                "respuesta": ["inmediata", "constructiva", "específica"],
+                "explicacion": "Existen diferentes tipos de retroalimentación, como la inmediata y constructiva."
+            },
+            {
+                "tipo": "abierta",
+                "pregunta": "¿Por qué es importante la retroalimentación en el aprendizaje?",
+                "respuesta": ["mejora", "ajuste", "corrección"],
+                "explicacion": "La retroalimentación es importante porque permite mejorar y ajustar el aprendizaje."
+            }
+        ],
+        "recursos": {
+            "video": {
+                "titulo": "Optimización de Retroalimentación Educativa con IA",
+                "url": "https://www.youtube.com/watch?v=ejemplo1"
+            },
+            "pdf": {
+                "titulo": "Guía Completa de Retroalimentación Formativa",
+                "url": "https://example.com/retroalimentacion.pdf"
+            }
+        }
+    },
+    "personalización del aprendizaje": {
+        "texto": "La personalización del aprendizaje se refiere a adaptar la enseñanza a las necesidades y estilos de aprendizaje de cada estudiante. Con la ayuda de la IA, es posible analizar datos de rendimiento y preferencias de los estudiantes para ofrecer contenido y actividades que se ajusten a sus características individuales. Esto no solo mejora la motivación, sino que también optimiza el proceso de aprendizaje.",
+        "preguntas": [
+            {
+                "tipo": "opcion",
+                "pregunta": "¿Qué permite la personalización del aprendizaje?",
+                "opciones": ["A. Un enfoque único para todos", "B. Adaptar la enseñanza a cada estudiante", "C. Ignorar las necesidades individuales", "D. Aumentar la carga de trabajo"],
+                "respuesta": "B",
+                "explicacion": "La personalización permite adaptar la enseñanza a las necesidades de cada estudiante."
+            },
+            {
+                "tipo": "vf",
+                "pregunta": "La personalización del aprendizaje no mejora la motivación. (V/F)",
+                "respuesta": "F",
+                "explicacion": "La personalización del aprendizaje puede mejorar la motivación de los estudiantes."
+            },
+            {
+                "tipo": "abierta",
+                "pregunta": "Menciona una herramienta que permita la personalización del aprendizaje.",
+                "respuesta": ["plataformas de aprendizaje", "IA", "software educativo"],
+                "explicacion": "Existen herramientas y plataformas que permiten personalizar el aprendizaje."
+            },
+            {
+                "tipo": "abierta",
+                "pregunta": "¿Por qué es importante personalizar el aprendizaje?",
+                "respuesta": ["necesidades", "eficacia", "motivación"],
+                "explicacion": "Es importante para atender las necesidades individuales y mejorar la eficacia del aprendizaje."
+            }
+        ],
+        "recursos": {
+            "video": {
+                "titulo": "Personalizando el Aprendizaje con Inteligencia Artificial",
+                "url": "https://www.youtube.com/watch?v=ejemplo2"
+            },
+            "pdf": {
+                "titulo": "Manual de Aprendizaje Adaptativo",
+                "url": "https://example.com/personalizacion.pdf"
+            }
+        }
+    }
+}
 
 # -------------------------------
-# FUNCIONES DEL EXAMEN
+# FUNCIONES PRINCIPALES
 # -------------------------------
 
 def hacer_pregunta(p):
-    print("\n📌", p["pregunta"])
     if p["tipo"] == "opcion":
-        for op in p["opciones"]:
-            print(op)
-        r = input("Tu respuesta: ").strip().upper()
+        r = st.radio(p["pregunta"], p["opciones"])
         if r == p["respuesta"]:
-            print("✅ ¡Correcto!")
+            st.success("¡Correcto!")
             return True
         else:
-            print("❌ Incorrecto. Revisa el concepto.")
-            print("📘", p["explicacion"])
+            st.error("Incorrecto. Revisa el concepto.")
+            st.info(p["explicacion"])
             return False
 
     elif p["tipo"] == "vf":
-        r = input("Responde V o F: ").strip().upper()
+        r = st.radio(p["pregunta"], ["V", "F"])
         if r == p["respuesta"]:
-            print("✅ ¡Correcto!")
+            st.success("¡Correcto!")
             return True
         else:
-            print("❌ Incorrecto. Revisa el concepto.")
-            print("📘", p["explicacion"])
+            st.error("Incorrecto. Revisa el concepto.")
+            st.info(p["explicacion"])
             return False
 
     elif p["tipo"] == "abierta":
-        r = input("Tu respuesta: ").strip().lower()
-        for val in p["respuesta"]:
-            if val in r:
-                print("✅ ¡Correcto!")
-                return True
-        print("❌ Incorrecto. Revisa el concepto.")
-        print("📘", p["explicacion"])
-        return False
-
+        r = st.text_input(p["pregunta"])
+        if any(val in r.lower() for val in p["respuesta"]):
+            st.success("¡Correcto!")
+            return True
+        else:
+            st.error("Incorrecto. Revisa el concepto.")
+            st.info(p["explicacion"])
+            return False
 
 def examen_nivel(nombre_nivel):
-    print(f"\n📚 Nivel: {nombre_nivel.upper()} (Debes acertar al menos 4 de 5)")
+    st.write(f"🧪 Nivel: {nombre_nivel.upper()} (Debes acertar al menos 4 de 5)")
     preguntas = random.sample(niveles[nombre_nivel], 5)
     puntaje = 0
     for p in preguntas:
         if hacer_pregunta(p):
             puntaje += 1
-    print(f"\nResultado: {puntaje}/5")
-    return puntaje >= 4
+    st.write(f"📊 Resultado: {puntaje}/5")
+    return puntaje
 
+def reforzar_conceptos():
+    st.write("🔁 Vamos a reforzar juntos este tema.")
+    subtema_seleccionado = random.choice(list(subtemas.keys()))
+    st.write(f"📚 Tema de refuerzo: {subtema_seleccionado.upper()}")
+    st.write(subtemas[subtema_seleccionado]["texto"])
 
-# -------------------------------
-# FLUJO ADAPTATIVO
-# -------------------------------
+    preguntas_refuerzo = random.sample(subtemas[subtema_seleccionado]["preguntas"], 4)
+    puntaje_refuerzo = 0
 
-print("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
-print("Comenzarás con el nivel BÁSICO.")
-print("Debes aprobar con al menos 80% para avanzar.\n")
+    for p in preguntas_refuerzo:
+        if hacer_pregunta(p):
+            puntaje_refuerzo += 1
 
-if examen_nivel("básico"):
-    print("\n🎉 ¡Bien hecho! Pasas al nivel INTERMEDIO.")
-    if examen_nivel("intermedio"):
-        print("\n🌟 ¡Excelente! Ahora el nivel AVANZADO.")
-        if examen_nivel("avanzado"):
-            print("\n🏆 ¡Felicidades! Has completado exitosamente los tres niveles.")
-        else:
-            print("\n🔁 No aprobaste el nivel avanzado. Inténtalo nuevamente luego.")
+    st.write(f"📊 Puntaje de refuerzo: {puntaje_refuerzo}/4")
+
+    if puntaje_refuerzo >= 3:
+        st.success("🎉 ¡Refuerzo exitoso! Puedes continuar.")
+        return True
     else:
-        print("\n🔁 No aprobaste el nivel intermedio. Intenta reforzar tus conocimientos.")
-else:
-    print("\n🔁 No aprobaste el nivel básico. Refuerza tus conceptos antes de continuar.")
+        st.error("❗ Necesitas más práctica. Te recomendamos estos recursos:")
+        st.write(f"📹 Video: {subtemas[subtema_seleccionado]['recursos']['video']['titulo']}")
+        st.write(f"[Ver Video]({subtemas[subtema_seleccionado]['recursos']['video']['url']})")
+        st.write(f"📄 PDF: {subtemas[subtema_seleccionado]['recursos']['pdf']['titulo']}")
+        st.write(f"[Ver PDF]({subtemas[subtema_seleccionado]['recursos']['pdf']['url']})")
+        return False
+
+# -------------------------------
+# FLUJO PRINCIPAL
+# -------------------------------
+
+def main():
+    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
+
+    st.header("📘 Bienvenida")
+    st.write("""
+    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
+    
+    - Comenzarás por el nivel BÁSICO.
+    - Debes responder al menos 4 de 5 preguntas correctamente para avanzar.
+    - Si no apruebas, recibirás un refuerzo con preguntas y recursos de aprendizaje.
+    
+    👉 Selecciona un tema y luego presiona uno de los botones para comenzar.
+    """)
+
+    # Selección de tema
+    tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
+
+    # Botones para niveles
+    if st.button("Nivel BÁSICO"):
+        st.write("📘 Comenzarás con el nivel BÁSICO.")
+        if examen_nivel("básico") >= 4:
+            st.success("✅ ¡Pasas al nivel INTERMEDIO!")
+        else:
+            st.warning("🔁 No aprobaste el nivel BÁSICO. Vamos a reforzar.")
+            if not reforzar_conceptos():
+                st.info("📌 Revisa los recursos y vuelve a intentarlo más tarde.")
+                return
+
+    if st.button("Nivel INTERMEDIO"):
+        st.write("📘 Intentando acceder al nivel INTERMEDIO.")
+        if examen_nivel("básico") < 4:
+            st.warning("❗ Debes aprobar el nivel BÁSICO para acceder al nivel INTERMEDIO.")
+        else:
+            if examen_nivel("intermedio") >= 4:
+                st.success("✅ ¡Pasas al nivel AVANZADO!")
+            else:
+                st.warning("🔁 No aprobaste el nivel INTERMEDIO. Vamos a reforzar.")
+                if not reforzar_conceptos():
+                    st.info("📌 Revisa los recursos y vuelve a intentarlo más tarde.")
+                    return
+
+    if st.button("Nivel AVANZADO"):
+        st.write("📘 Intentando acceder al nivel AVANZADO.")
+        if examen_nivel("intermedio") < 4:
+            st.warning("❗ Debes aprobar el nivel INTERMEDIO para acceder al nivel AVANZADO.")
+        else:
+            if examen_nivel("avanzado") >= 4:
+                st.success("🏁 ¡Felicidades! Has completado exitosamente todos los niveles.")
+            else:
+                st.warning("🔁 No aprobaste el nivel AVANZADO. Vamos a reforzar.")
+                if reforzar_conceptos():
+                    st.success("🎯 ¡Listo! Has completado el examen adaptativo.")
+                else:
+                    st.info("📌 Revisa los recursos y vuelve a intentarlo más tarde.")
+
+# Ejecutar siempre el flujo principal
+main()
