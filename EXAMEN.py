@@ -379,11 +379,12 @@ elif st.session_state.get('iniciado_intermedio', False):
 elif st.session_state.get('iniciado_avanzado', False):
     examen_nivel("avanzado")
 
-# -------------------------------
+# ------------------------------
 # EJECUTAR APP
 # -------------------------------
 if __name__ == "__main__":
 main()
+
 
 
 
