@@ -203,7 +203,7 @@ subtemas = {
 
 def hacer_pregunta(p):
     if p["tipo"] == "opcion":
-        r = st.radio(p["pregunta"], p["opciones"])
+        r = st.radio(p["pregunta"], p["opciones"], key=p["pregunta"])
         if r == p["respuesta"]:
             st.success("¡Correcto!")
             return True
@@ -213,7 +213,7 @@ def hacer_pregunta(p):
             return False
 
     elif p["tipo"] == "vf":
-        r = st.radio(p["pregunta"], ["V", "F"])
+        r = st.radio(p["pregunta"], ["V", "F"], key=p["pregunta"])
         if r == p["respuesta"]:
             st.success("¡Correcto!")
             return True
@@ -223,7 +223,7 @@ def hacer_pregunta(p):
             return False
 
     elif p["tipo"] == "abierta":
-        r = st.text_input(p["pregunta"])
+        r = st.text_input(p["pregunta"], key=p["pregunta"])
         if any(val in r.lower() for val in p["respuesta"]):
             st.success("¡Correcto!")
             return True
@@ -236,10 +236,24 @@ def examen_nivel(nombre_nivel):
     st.write(f"🧪 Nivel: {nombre_nivel.upper()} (Debes acertar al menos 4 de 5)")
     preguntas = random.sample(niveles[nombre_nivel], 5)
     puntaje = 0
-    for p in preguntas:
+    pregunta_actual = st.session_state.get('pregunta_actual', 0)
+
+    if pregunta_actual < len(preguntas):
+        p = preguntas[pregunta_actual]
         if hacer_pregunta(p):
             puntaje += 1
-    st.write(f"📊 Resultado: {puntaje}/5")
+            st.session_state['pregunta_actual'] += 1
+        else:
+            st.session_state['pregunta_actual'] += 1
+
+    if st.session_state['pregunta_actual'] >= len(preguntas):
+        st.write(f"📊 Resultado: {puntaje}/5")
+        st.session_state['pregunta_actual'] = 0  # Reiniciar para el siguiente examen
+        return puntaje
+
+    if st.button("Siguiente pregunta"):
+        st.session_state['pregunta_actual'] += 1
+
     return puntaje
 
 def reforzar_conceptos():
@@ -250,23 +264,34 @@ def reforzar_conceptos():
 
     preguntas_refuerzo = random.sample(subtemas[subtema_seleccionado]["preguntas"], 4)
     puntaje_refuerzo = 0
+    pregunta_actual = st.session_state.get('pregunta_refuerzo_actual', 0)
 
-    for p in preguntas_refuerzo:
+    if pregunta_actual < len(preguntas_refuerzo):
+        p = preguntas_refuerzo[pregunta_actual]
         if hacer_pregunta(p):
             puntaje_refuerzo += 1
+            st.session_state['pregunta_refuerzo_actual'] += 1
+        else:
+            st.session_state['pregunta_refuerzo_actual'] += 1
 
-    st.write(f"📊 Puntaje de refuerzo: {puntaje_refuerzo}/4")
+    if st.session_state['pregunta_refuerzo_actual'] >= len(preguntas_refuerzo):
+        st.write(f"📊 Puntaje de refuerzo: {puntaje_refuerzo}/4")
+        st.session_state['pregunta_refuerzo_actual'] = 0  # Reiniciar para el siguiente refuerzo
+        if puntaje_refuerzo >= 3:
+            st.success("🎉 ¡Refuerzo exitoso! Puedes continuar.")
+            return True
+        else:
+            st.error("❗ Necesitas más práctica. Te recomendamos estos recursos:")
+            st.write(f"📹 Video: {subtemas[subtema_seleccionado]['recursos']['video']['titulo']}")
+            st.write(f"[Ver Video]({subtemas[subtema_seleccionado]['recursos']['video']['url']})")
+            st.write(f"📄 PDF: {subtemas[subtema_seleccionado]['recursos']['pdf']['titulo']}")
+            st.write(f"[Ver PDF]({subtemas[subtema_seleccionado]['recursos']['pdf']['url']})")
+            return False
 
-    if puntaje_refuerzo >= 3:
-        st.success("🎉 ¡Refuerzo exitoso! Puedes continuar.")
-        return True
-    else:
-        st.error("❗ Necesitas más práctica. Te recomendamos estos recursos:")
-        st.write(f"📹 Video: {subtemas[subtema_seleccionado]['recursos']['video']['titulo']}")
-        st.write(f"[Ver Video]({subtemas[subtema_seleccionado]['recursos']['video']['url']})")
-        st.write(f"📄 PDF: {subtemas[subtema_seleccionado]['recursos']['pdf']['titulo']}")
-        st.write(f"[Ver PDF]({subtemas[subtema_seleccionado]['recursos']['pdf']['url']})")
-        return False
+    if st.button("Siguiente pregunta"):
+        st.session_state['pregunta_refuerzo_actual'] += 1
+
+    return False
 
 # -------------------------------
 # FLUJO PRINCIPAL
@@ -285,6 +310,12 @@ def main():
     
     👉 Selecciona un tema y luego presiona uno de los botones para comenzar.
     """)
+
+    # Inicializar el estado de la sesión
+    if 'pregunta_actual' not in st.session_state:
+        st.session_state['pregunta_actual'] = 0
+    if 'pregunta_refuerzo_actual' not in st.session_state:
+        st.session_state['pregunta_refuerzo_actual'] = 0
 
     # Selección de tema
     tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
