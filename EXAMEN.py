@@ -122,7 +122,7 @@ subtemas = {
                 "tipo": "opcion",
                 "pregunta": "¿Qué caracteriza a una retroalimentación efectiva?",
                 "opciones": ["A. Ser vaga", "B. Ser específica y constructiva", "C. Ser solo positiva", "D. No ser oportuna"],
-                "respuesta": "B",
+                "respuesta": "B. Ser específica y constructiva",
                 "explicacion": "La retroalimentación efectiva debe ser específica y constructiva."
             },
             {
@@ -417,6 +417,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
