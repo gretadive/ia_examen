@@ -279,6 +279,15 @@ def examen_nivel(nivel):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
+        # Mostrar botones de retroalimentación y recursos si no se aprueba
+        if puntaje < 4:
+            st.warning("❗ No aprobaste el nivel. Aquí tienes más recursos:")
+            if st.button("Ver Recursos (Video/PDF)"):
+                st.write("📹 Video: [Optimización de Retroalimentación Educativa con IA](https://www.youtube.com/watch?v=ejemplo1)")
+                st.write("📄 PDF: [Guía Completa de Retroalimentación Formativa](https://example.com/retroalimentacion.pdf)")
+            if st.button("Ver Retroalimentación"):
+                st.write("🔁 Aquí puedes revisar los conceptos que necesitas reforzar.")
+
         return puntaje
 
     return -1  # aún no termina
@@ -299,6 +308,9 @@ def main():
     # Inicializar estados generales una sola vez
     for nivel in ["básico", "intermedio", "avanzado"]:
         st.session_state.setdefault(f'iniciado_{nivel}', False)
+
+    # Selección de tema
+    tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
 
     # Botones de inicio
     col1, col2, col3 = st.columns(3)
