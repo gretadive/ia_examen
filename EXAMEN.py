@@ -367,10 +367,22 @@ def mostrar_recursos(tema):
 # -----------------------------------
 
 def main():
+    st.session_state.setdefault("mostrar", None)
+
+    if st.session_state["mostrar"] == "refuerzo":
+        tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
+        realizar_refuerzo(tema)
+        return
+
+    if st.session_state["mostrar"] == "recursos":
+        tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
+        mostrar_recursos(tema)
+        return
+
+    # Solo se muestra si no está en refuerzo ni recursos
     st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
     st.markdown("Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**. Debes aprobar con 4/5 para avanzar.")
 
-    # Inicializar estado si no existe
     for nivel in ["básico", "intermedio", "avanzado"]:
         st.session_state.setdefault(f'iniciado_{nivel}', False)
 
@@ -405,6 +417,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
