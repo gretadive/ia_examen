@@ -306,22 +306,26 @@ def realizar_refuerzo(tema):
 
     while st.session_state['actual_refuerzo'] < len(preguntas_refuerzo):
         p = preguntas_refuerzo[st.session_state['actual_refuerzo']]
+        
+        # Asegurarse de que la clave sea única
+        key_prefix = f"refuerzo_{st.session_state['actual_refuerzo']}"
+        
         if p["tipo"] == "opcion":
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
                 p["pregunta"],
                 p["opciones"],
-                key=f"refuerzo_{st.session_state['actual_refuerzo']}"
+                key=key_prefix  # Usar una clave única
             )
         elif p["tipo"] == "vf":
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
                 p["pregunta"],
                 ["V", "F"],
-                key=f"refuerzo_{st.session_state['actual_refuerzo']}"
+                key=key_prefix  # Usar una clave única
             )
         elif p["tipo"] == "abierta":
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.text_input(
                 p["pregunta"],
-                key=f"refuerzo_{st.session_state['actual_refuerzo']}"
+                key=key_prefix  # Usar una clave única
             )
 
         if st.button("Siguiente pregunta", key=f"siguiente_refuerzo_{st.session_state['actual_refuerzo']}"):
@@ -425,6 +429,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
