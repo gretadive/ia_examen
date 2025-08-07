@@ -279,14 +279,21 @@ def examen_nivel(nivel):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        # Mostrar botones de retroalimentación y recursos si no se aprueba
+        # Mostrar refuerzo automático según el tema seleccionado
         if puntaje < 4:
-            st.warning("❗ No aprobaste el nivel. Aquí tienes más recursos:")
-            if st.button("Ver Recursos (Video/PDF)"):
-                st.write("📹 Video: [Optimización de Retroalimentación Educativa con IA](https://www.youtube.com/watch?v=ejemplo1)")
-                st.write("📄 PDF: [Guía Completa de Retroalimentación Formativa](https://example.com/retroalimentacion.pdf)")
-            if st.button("Ver Retroalimentación"):
-                st.write("🔁 Aquí puedes revisar los conceptos que necesitas reforzar.")
+            tema_seleccionado = st.session_state.get('tema_seleccionado', None)
+            if tema_seleccionado:
+                subtema = "retroalimentación" if tema_seleccionado == "retroalimentación" else "personalización del aprendizaje"
+                st.write(f"🔁 Vamos a reforzar el tema: **{subtema.upper()}**")
+                st.write(subtemas[subtema]["texto"])
+                preguntas_refuerzo = random.sample(subtemas[subtema]["preguntas"], 4)
+                for p in preguntas_refuerzo:
+                    if p["tipo"] == "opcion":
+                        st.radio(p["pregunta"], p["opciones"])
+                    elif p["tipo"] == "vf":
+                        st.radio(p["pregunta"], ["V", "F"])
+                    elif p["tipo"] == "abierta":
+                        st.text_input(p["pregunta"])
 
         return puntaje
 
@@ -311,6 +318,7 @@ def main():
 
     # Selección de tema
     tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
+    st.session_state['tema_seleccionado'] = tema_seleccionado  # Guardar el tema seleccionado
 
     # Botones de inicio
     col1, col2, col3 = st.columns(3)
