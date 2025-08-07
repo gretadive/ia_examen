@@ -305,11 +305,11 @@ def realizar_refuerzo(tema):
         for i, p in enumerate(preguntas_refuerzo):
             key = f"ref_refuerzo_{i}_{subtema}"
             if p["tipo"] == "opcion":
-                st.radio(p["pregunta"], p["opciones"], key=key)
+                st.session_state['respuestas_refuerzo'][i] = st.radio(p["pregunta"], p["opciones"], index=p["opciones"].index(st.session_state['respuestas_refuerzo'][i]) if st.session_state['respuestas_refuerzo'][i] else 0, key=key)
             elif p["tipo"] == "vf":
-                st.radio(p["pregunta"], ["V", "F"], key=key)
+                st.session_state['respuestas_refuerzo'][i] = st.radio(p["pregunta"], ["V", "F"], index=["V", "F"].index(st.session_state['respuestas_refuerzo'][i]) if st.session_state['respuestas_refuerzo'][i] else 0, key=key)
             elif p["tipo"] == "abierta":
-                st.text_input(p["pregunta"], key=key)
+                st.session_state['respuestas_refuerzo'][i] = st.text_input(p["pregunta"], value=st.session_state['respuestas_refuerzo'][i] if st.session_state['respuestas_refuerzo'][i] else "", key=key)
 
         submit_button = st.form_submit_button("Enviar Respuestas")
 
@@ -342,7 +342,10 @@ def realizar_refuerzo(tema):
         if puntaje < 3:
             st.warning("📚 Aquí tienes recursos para mejorar:")
             mostrar_recursos(subtema)
-
+        else:
+            st.success("🎉 ¡Has aprobado el refuerzo! Ahora puedes continuar al siguiente nivel.")
+            if st.button("▶️ Continuar a INTERMEDIO"):
+                iniciar_examen("intermedio")
 
 
 
@@ -394,6 +397,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
