@@ -201,97 +201,75 @@ subtemas = {
 # FUNCIONES PRINCIPALES
 # -------------------------------
 
-def hacer_pregunta(p):
+def hacer_pregunta(p, nombre_nivel):
+    respuesta_usuario = None
     if p["tipo"] == "opcion":
-        r = st.radio(p["pregunta"], p["opciones"], key=p["pregunta"])
-        if r == p["respuesta"]:
-            st.success("¡Correcto!")
-            return True
-        else:
-            st.error("Incorrecto. Revisa el concepto.")
-            st.info(p["explicacion"])
-            return False
-
+        respuesta_usuario = st.radio(p["pregunta"], p["opciones"], key=f"{nombre_nivel}_{p['pregunta']}")
     elif p["tipo"] == "vf":
-        r = st.radio(p["pregunta"], ["V", "F"], key=p["pregunta"])
-        if r == p["respuesta"]:
-            st.success("¡Correcto!")
-            return True
-        else:
-            st.error("Incorrecto. Revisa el concepto.")
-            st.info(p["explicacion"])
-            return False
-
+        respuesta_usuario = st.radio(p["pregunta"], ["V", "F"], key=f"{nombre_nivel}_{p['pregunta']}")
     elif p["tipo"] == "abierta":
-        r = st.text_input(p["pregunta"], key=p["pregunta"])
-        if any(val in r.lower() for val in p["respuesta"]):
-            st.success("¡Correcto!")
-            return True
-        else:
-            st.error("Incorrecto. Revisa el concepto.")
-            st.info(p["explicacion"])
-            return False
+        respuesta_usuario = st.text_input(p["pregunta"], key=f"{nombre_nivel}_{p['pregunta']}")
+    return respuesta_usuario
+
+def verificar_respuesta(pregunta, respuesta_usuario):
+    if pregunta["tipo"] in ["opcion", "vf"]:
+        return respuesta_usuario == pregunta["respuesta"]
+    elif pregunta["tipo"] == "abierta":
+        return any(val in respuesta_usuario.lower() for val in pregunta["respuesta"])
+    return False
 
 def examen_nivel(nombre_nivel):
     st.write(f"🧪 Nivel: {nombre_nivel.upper()} (Debes acertar al menos 4 de 5)")
-    preguntas = random.sample(niveles[nombre_nivel], 5)
-    puntaje = st.session_state.get('puntaje', 0)
-    pregunta_actual = st.session_state.get('pregunta_actual', 0)
 
-    if pregunta_actual < len(preguntas):
-        p = preguntas[pregunta_actual]
-        if hacer_pregunta(p):
-            puntaje += 1
-        st.session_state['puntaje'] = puntaje
-        st.session_state['pregunta_actual'] += 1
+    # Inicializar el estado
+    if f'preguntas_{nombre_nivel}' not in st.session_state:
+        st.session_state[f'preguntas_{nombre_nivel}'] = random.sample(niveles[nombre_nivel], 5)
+        st.session_state[f'respuestas_{nombre_nivel}'] = [None] * 5
+        st.session_state[f'actual_{nombre_nivel}'] = 0
+        st.session_state[f'finalizado_{nombre_nivel}'] = False
 
-    if st.session_state['pregunta_actual'] >= len(preguntas):
-        st.write(f"📊 Resultado: {puntaje}/5")
-        st.session_state['pregunta_actual'] = 0  # Reiniciar para el siguiente examen
-        st.session_state['puntaje'] = 0  # Reiniciar el puntaje
-        return puntaje
+    preguntas = st.session_state[f'preguntas_{nombre_nivel}']
+    actual = st.session_state[f'actual_{nombre_nivel}']
+    respuestas = st.session_state[f'respuestas_{nombre_nivel}']
 
-    if st.button("Siguiente pregunta"):
-        st.session_state['pregunta_actual'] += 1
+    # Barra de progreso
+    progreso = int((actual / 5) * 100)
+    st.progress(progreso, text=f"{actual}/5 preguntas respondidas")
 
-    return puntaje
+    # Mostrar pregunta actual
+    if actual < 5:
+        p = preguntas[actual]
+        r_usuario = hacer_pregunta(p, nombre_nivel)
+        if st.button("Siguiente pregunta", key=f"btn_siguiente_{nombre_nivel}_{actual}"):
+            if r_usuario is not None and r_usuario != "":
+                respuestas[actual] = r_usuario
+                st.session_state[f'actual_{nombre_nivel}'] += 1
+            else:
+                st.warning("Por favor responde antes de continuar.")
 
-def reforzar_conceptos():
-    st.write("🔁 Vamos a reforzar juntos este tema.")
-    subtema_seleccionado = random.choice(list(subtemas.keys()))
-    st.write(f"📚 Tema de refuerzo: {subtema_seleccionado.upper()}")
-    st.write(subtemas[subtema_seleccionado]["texto"])
+    # Evaluar si terminó
+    if st.session_state[f'actual_{nombre_nivel}'] >= 5:
+        if not st.session_state[f'finalizado_{nombre_nivel}']:
+            puntaje = 0
+            for i, p in enumerate(preguntas):
+                if verificar_respuesta(p, respuestas[i]):
+                    puntaje += 1
+            st.session_state[f'puntaje_{nombre_nivel}'] = puntaje
+            st.session_state[f'finalizado_{nombre_nivel}'] = True
 
-    preguntas_refuerzo = random.sample(subtemas[subtema_seleccionado]["preguntas"], 4)
-    puntaje_refuerzo = st.session_state.get('puntaje_refuerzo', 0)
-    pregunta_actual = st.session_state.get('pregunta_refuerzo_actual', 0)
+        puntaje_final = st.session_state[f'puntaje_{nombre_nivel}']
+        st.write(f"📊 Resultado: {puntaje_final}/5")
+        for i, p in enumerate(preguntas):
+            correcto = verificar_respuesta(p, respuestas[i])
+            if correcto:
+                st.success(f"✅ Pregunta {i+1}: Correcto")
+            else:
+                st.error(f"❌ Pregunta {i+1}: Incorrecto")
+                st.info(f"ℹ️ Explicación: {p['explicacion']}")
+        return puntaje_final
 
-    if pregunta_actual < len(preguntas_refuerzo):
-        p = preguntas_refuerzo[pregunta_actual]
-        if hacer_pregunta(p):
-            puntaje_refuerzo += 1
-        st.session_state['puntaje_refuerzo'] = puntaje_refuerzo
-        st.session_state['pregunta_refuerzo_actual'] += 1
+    return -1  # No finalizado
 
-    if st.session_state['pregunta_refuerzo_actual'] >= len(preguntas_refuerzo):
-        st.write(f"📊 Puntaje de refuerzo: {puntaje_refuerzo}/4")
-        st.session_state['pregunta_refuerzo_actual'] = 0  # Reiniciar para el siguiente refuerzo
-        st.session_state['puntaje_refuerzo'] = 0  # Reiniciar el puntaje
-        if puntaje_refuerzo >= 3:
-            st.success("🎉 ¡Refuerzo exitoso! Puedes continuar.")
-            return True
-        else:
-            st.error("❗ Necesitas más práctica. Te recomendamos estos recursos:")
-            st.write(f"📹 Video: {subtemas[subtema_seleccionado]['recursos']['video']['titulo']}")
-            st.write(f"[Ver Video]({subtemas[subtema_seleccionado]['recursos']['video']['url']})")
-            st.write(f"📄 PDF: {subtemas[subtema_seleccionado]['recursos']['pdf']['titulo']}")
-            st.write(f"[Ver PDF]({subtemas[subtema_seleccionado]['recursos']['pdf']['url']})")
-            return False
-
-    if st.button("Siguiente pregunta"):
-        st.session_state['pregunta_refuerzo_actual'] += 1
-
-    return False
 
 # -------------------------------
 # FLUJO PRINCIPAL
@@ -311,57 +289,48 @@ def main():
     👉 Selecciona un tema y luego presiona uno de los botones para comenzar.
     """)
 
-    # Inicializar el estado de la sesión
-    if 'pregunta_actual' not in st.session_state:
-        st.session_state['pregunta_actual'] = 0
-    if 'pregunta_refuerzo_actual' not in st.session_state:
-        st.session_state['pregunta_refuerzo_actual'] = 0
-    if 'puntaje' not in st.session_state:
-        st.session_state['puntaje'] = 0
-    if 'puntaje_refuerzo' not in st.session_state:
-        st.session_state['puntaje_refuerzo'] = 0
+    tema_seleccionado = st.selectbox("Selecciona un tema:", list(subtemas.keys()))
 
-    # Selección de tema
-    tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
-
-    # Botones para niveles
     if st.button("Nivel BÁSICO"):
-        st.write("📘 Comenzarás con el nivel BÁSICO.")
-        if examen_nivel("básico") >= 4:
-            st.success("✅ ¡Pasas al nivel INTERMEDIO!")
-        else:
-            st.warning("🔁 No aprobaste el nivel BÁSICO. Vamos a reforzar.")
-            if not reforzar_conceptos():
-                st.info("📌 Revisa los recursos y vuelve a intentarlo más tarde.")
-                return
+        resultado = examen_nivel("básico")
+        if resultado >= 0:
+            if resultado >= 4:
+                st.success("✅ ¡Pasas al nivel INTERMEDIO!")
+            else:
+                st.warning("🔁 No aprobaste el nivel BÁSICO. Vamos a reforzar.")
 
     if st.button("Nivel INTERMEDIO"):
-        st.write("📘 Intentando acceder al nivel INTERMEDIO.")
-        if examen_nivel("básico") < 4:
+        if st.session_state.get('puntaje_básico', 0) < 4:
             st.warning("❗ Debes aprobar el nivel BÁSICO para acceder al nivel INTERMEDIO.")
         else:
-            if examen_nivel("intermedio") >= 4:
-                st.success("✅ ¡Pasas al nivel AVANZADO!")
-            else:
-                st.warning("🔁 No aprobaste el nivel INTERMEDIO. Vamos a reforzar.")
-                if not reforzar_conceptos():
-                    st.info("📌 Revisa los recursos y vuelve a intentarlo más tarde.")
-                    return
+            resultado = examen_nivel("intermedio")
+            if resultado >= 0:
+                if resultado >= 4:
+                    st.success("✅ ¡Pasas al nivel AVANZADO!")
+                else:
+                    st.warning("🔁 No aprobaste el nivel INTERMEDIO. Vamos a reforzar.")
 
     if st.button("Nivel AVANZADO"):
-        st.write("📘 Intentando acceder al nivel AVANZADO.")
-        if examen_nivel("intermedio") < 4:
+        if st.session_state.get('puntaje_intermedio', 0) < 4:
             st.warning("❗ Debes aprobar el nivel INTERMEDIO para acceder al nivel AVANZADO.")
         else:
-            if examen_nivel("avanzado") >= 4:
-                st.success("🏁 ¡Felicidades! Has completado exitosamente todos los niveles.")
-            else:
-                st.warning("🔁 No aprobaste el nivel AVANZADO. Vamos a reforzar.")
-                if reforzar_conceptos():
-                    st.success("🎯 ¡Listo! Has completado el examen adaptativo.")
+            resultado = examen_nivel("avanzado")
+            if resultado >= 0:
+                if resultado >= 4:
+                    st.success("🏁 ¡Felicidades! Has completado exitosamente todos los niveles.")
                 else:
-                    st.info("📌 Revisa los recursos y vuelve a intentarlo más tarde.")
+                    st.warning("🔁 No aprobaste el nivel AVANZADO. Vamos a reforzar.")
 
-# Ejecutar siempre el flujo principal
+
+# -------------------------------
+# DATOS (niveles y subtemas)
+# -------------------------------
+
+# Incluye aquí las secciones `niveles` y `subtemas` que ya tienes, no es necesario modificarlas para que esto funcione correctamente.
+
+# -------------------------------
+# EJECUTAR
+# -------------------------------
 main()
+
 
