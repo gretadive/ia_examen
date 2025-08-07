@@ -197,30 +197,28 @@ subtemas = {
     }
 }
 
-# -----------------------------------
-# FUNCIONES PARA CADA NIVEL DE EXAMEN
-# -----------------------------------
-
+# --------------------------
+# FUNCIONES AUXILIARES
+# --------------------------
 def iniciar_examen(nivel):
     st.session_state[f'iniciado_{nivel}'] = True
     for otro in ["básico", "intermedio", "avanzado"]:
         if otro != nivel:
             st.session_state[f'iniciado_{otro}'] = False
-    if f'preguntas_{nivel}' not in st.session_state:
-        st.session_state[f'preguntas_{nivel}'] = random.sample(niveles[nivel], 5)
-        st.session_state[f'respuestas_{nivel}'] = [None] * 5
-        st.session_state[f'actual_{nivel}'] = 0
-        st.session_state[f'finalizado_{nivel}'] = False
+    st.session_state[f'preguntas_{nivel}'] = random.sample(niveles[nivel], 5)
+    st.session_state[f'respuestas_{nivel}'] = [None] * 5
+    st.session_state[f'actual_{nivel}'] = 0
+    st.session_state[f'finalizado_{nivel}'] = False
+    st.session_state["mostrar"] = None
 
-
-
-def limpiar_examen(nivel):
+def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'iniciado_{nivel}'] = False
     st.session_state[f'finalizado_{nivel}'] = False
     st.session_state[f'actual_{nivel}'] = 0
     st.session_state[f'puntaje_{nivel}'] = 0
     st.session_state[f'respuestas_{nivel}'] = [None] * 5
-    st.session_state[f'preguntas_{nivel}'] = random.sample(niveles[nivel], 5)
+    st.session_state["mostrar"] = accion
+    st.rerun()
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -268,7 +266,6 @@ def examen_nivel(nivel):
             elif p["tipo"] == "abierta":
                 if any(val in respuestas[i].lower() for val in p["respuesta"]):
                     puntaje += 1
-
         st.session_state[f'puntaje_{nivel}'] = puntaje
         st.session_state[f'finalizado_{nivel}'] = True
 
@@ -281,7 +278,6 @@ def examen_nivel(nivel):
                 correcto = respuestas[i] == p["respuesta"]
             elif p["tipo"] == "abierta":
                 correcto = any(val in respuestas[i].lower() for val in p["respuesta"])
-
             if correcto:
                 st.success(f"✅ Pregunta {i+1}: Correcta")
             else:
@@ -291,11 +287,9 @@ def examen_nivel(nivel):
         if puntaje < 4:
             st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
             if st.button("🔁 Reforzamos"):
-                limpiar_examen(nivel)
-                realizar_refuerzo(st.session_state['tema_seleccionado'])
+                limpiar_y_redirigir(nivel, "refuerzo")
             if st.button("📚 Ver Recursos"):
-                limpiar_examen(nivel)
-                mostrar_recursos(st.session_state['tema_seleccionado'])
+                limpiar_y_redirigir(nivel, "recursos")
         else:
             if nivel == "básico":
                 if st.button("▶️ Continuar a INTERMEDIO"):
@@ -310,7 +304,6 @@ def realizar_refuerzo(tema):
     st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
     st.write(subtemas[subtema]["texto"])
 
-    # Inicializar el estado de las respuestas si no existe
     if 'respuestas_refuerzo' not in st.session_state:
         st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
 
@@ -334,7 +327,7 @@ def realizar_refuerzo(tema):
                 if r == p["respuesta"]:
                     puntaje += 1
             elif p["tipo"] == "abierta":
-                if any(val in r.lower() for val in p["respuesta"]):
+                if any(val in str(r).lower() for val in p["respuesta"]):
                     puntaje += 1
 
         st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{len(preguntas_refuerzo)}")
@@ -344,8 +337,7 @@ def realizar_refuerzo(tema):
             if p["tipo"] in ["opcion", "vf"]:
                 correcto = r == p["respuesta"]
             elif p["tipo"] == "abierta":
-                correcto = any(val in r.lower() for val in p["respuesta"])
-
+                correcto = any(val in str(r).lower() for val in p["respuesta"])
             if correcto:
                 st.success(f"✅ Pregunta {i+1}: Correcta")
             else:
@@ -356,16 +348,19 @@ def realizar_refuerzo(tema):
             st.warning("📚 Aquí tienes recursos para mejorar:")
             mostrar_recursos(subtema)
         else:
-            st.success("🎉 ¡Has aprobado el refuerzo! Ahora puedes continuar al siguiente nivel.")
-            if st.button("▶️ Continuar a INTERMEDIO"):
-                iniciar_examen("intermedio")
-
-
+            st.success("🎉 ¡Has aprobado el refuerzo!")
+            if st.button("▶️ Volver al inicio"):
+                st.session_state["mostrar"] = None
+                st.rerun()
 
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
+    st.subheader("📚 Recursos adicionales")
     st.markdown(f"📹 **Video:** [{recursos['video']['titulo']}]({recursos['video']['url']})")
     st.markdown(f"📄 **PDF:** [{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
+    if st.button("🔙 Volver al inicio"):
+        st.session_state["mostrar"] = None
+        st.rerun()
 
 # -----------------------------------
 # FLUJO PRINCIPAL
@@ -410,6 +405,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
