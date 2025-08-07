@@ -355,5 +355,32 @@ def realizar_refuerzo(tema):
         else:
             st.error(f"❌ Pregunta {i+1}: Incorrecta")
             st.info(f"ℹ️ Explicación: {p['explicacion']}")
+    with col1:
+        if st.button("Iniciar Nivel BÁSICO"):
+            iniciar_examen("básico")
+    with col2:
+        if st.button("Iniciar Nivel INTERMEDIO"):
+            if st.session_state.get('puntaje_básico', 0) >= 4:
+                iniciar_examen("intermedio")
+            else:
+                st.warning("Debes aprobar el nivel BÁSICO primero.")
+    with col3:
+        if st.button("Iniciar Nivel AVANZADO"):
+            if st.session_state.get('puntaje_intermedio', 0) >= 4:
+                iniciar_examen("avanzado")
+            else:
+                st.warning("Debes aprobar el nivel INTERMEDIO primero.")
+    # Mostrar exámenes si se han iniciado
+    if st.session_state['iniciado_básico']:
+        examen_nivel("básico")
+    elif st.session_state['iniciado_intermedio']:
+        examen_nivel("intermedio")
+    elif st.session_state['iniciado_avanzado']:
+        examen_nivel("avanzado")
+# -------------------------------
+# EJECUTAR APP
+# -------------------------------
+main()
 
    
+
