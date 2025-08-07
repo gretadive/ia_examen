@@ -383,7 +383,8 @@ elif st.session_state.get('iniciado_avanzado', False):
 # EJECUTAR APP
 # -------------------------------
 if __name__ == "__main__":
-main()
+    main()
+
 
 
 
