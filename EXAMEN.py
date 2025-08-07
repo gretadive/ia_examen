@@ -277,14 +277,15 @@ def examen_nivel(nivel):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        if puntaje < 4:
-         st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
-          if st.button("🔁 Reforzamos"):
-           limpiar_examen(nivel)
-           realizar_refuerzo(st.session_state['tema_seleccionado'])
-          if st.button("📚 Ver Recursos"):
+    if puntaje < 4:
+    st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
+    if st.button("🔁 Reforzamos"):
+        limpiar_examen(nivel)
+        realizar_refuerzo(st.session_state['tema_seleccionado'])
+    if st.button("📚 Ver Recursos"):
         limpiar_examen(nivel)
         mostrar_recursos(st.session_state['tema_seleccionado'])
+        
        else:
             if nivel == "básico":
                 if st.button("▶️ Continuar a INTERMEDIO"):
@@ -404,6 +405,7 @@ def limpiar_examen(nivel):
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
