@@ -309,7 +309,7 @@ def realizar_refuerzo(tema):
         p = preguntas_refuerzo[st.session_state['actual_refuerzo']]
         
         # Asegurarse de que la clave sea única
-        key_prefix = f"refuerzo_{st.session_state['actual_refuerzo']}"
+        key_prefix = f"refuerzo_{st.session_state['actual_refuerzo']}_{subtema}"
         
         if p["tipo"] == "opcion":
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
@@ -329,7 +329,7 @@ def realizar_refuerzo(tema):
                 key=f"{key_prefix}_text"  # Usar una clave única
             )
 
-        if st.button("Siguiente pregunta", key=f"siguiente_refuerzo_{st.session_state['actual_refuerzo']}"):
+        if st.button("Siguiente pregunta", key=f"siguiente_refuerzo_{st.session_state['actual_refuerzo']}_{subtema}"):
             respuesta_usuario = st.session_state.get(f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}")
             if respuesta_usuario is not None and respuesta_usuario != "":
                 st.session_state['respuestas_refuerzo'][st.session_state['actual_refuerzo']] = respuesta_usuario
@@ -365,6 +365,7 @@ def realizar_refuerzo(tema):
     if puntaje_refuerzo < 3:
         st.warning("❗ No aprobaste el refuerzo. Aquí tienes más recursos:")
         mostrar_recursos(tema)
+
 
 def mostrar_recursos(tema):
     if tema == "retroalimentación":
@@ -425,6 +426,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
