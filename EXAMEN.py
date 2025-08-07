@@ -291,6 +291,13 @@ def examen_nivel(nivel):
 
     return -1  # aún no termina
 
+def main():
+    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
+    st.write("""
+    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
+    👉 Debes responder correctamente al menos 4 de 5 preguntas para avanzar.
+    """)
+
 def realizar_refuerzo(tema):
     subtema = "retroalimentación" if tema == "retroalimentación" else "personalización del aprendizaje"
     st.write(f"🔁 Vamos a reforzar el tema: **{subtema.upper()}**")
@@ -384,6 +391,7 @@ elif st.session_state.get('iniciado_avanzado', False):
 # -------------------------------
 if __name__ == "__main__":
     main()
+
 
 
 
