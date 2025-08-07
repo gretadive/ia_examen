@@ -279,74 +279,81 @@ def examen_nivel(nivel):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        # Mostrar refuerzo automático según el tema seleccionado
+        # Mostrar botones de refuerzo y recursos si no se aprueba
         if puntaje < 4:
-            tema_seleccionado = st.session_state.get('tema_seleccionado', None)
-            if tema_seleccionado:
-                subtema = "retroalimentación" if tema_seleccionado == "retroalimentación" else "personalización del aprendizaje"
-                st.write(f"🔁 Vamos a reforzar el tema: **{subtema.upper()}**")
-                st.write(subtemas[subtema]["texto"])
-                preguntas_refuerzo = random.sample(subtemas[subtema]["preguntas"], 4)
-                for p in preguntas_refuerzo:
-                    if p["tipo"] == "opcion":
-                        st.radio(p["pregunta"], p["opciones"])
-                    elif p["tipo"] == "vf":
-                        st.radio(p["pregunta"], ["V", "F"])
-                    elif p["tipo"] == "abierta":
-                        st.text_input(p["pregunta"])
+            st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
+            if st.button("Reforzamos"):
+                realizar_refuerzo(st.session_state['tema_seleccionado'])
+            if st.button("Recursos"):
+                mostrar_recursos(st.session_state['tema_seleccionado'])
+        else:
+            if st.button("Siguiente Nivel INTERMEDIO"):
+                iniciar_examen("intermedio")
 
         return puntaje
 
     return -1  # aún no termina
 
-# -----------------------------------
-# FLUJO PRINCIPAL
-# -----------------------------------
+def realizar_refuerzo(tema):
+    subtema = "retroalimentación" if tema == "retroalimentación" else "personalización del aprendizaje"
+    st.write(f"🔁 Vamos a reforzar el tema: **{subtema.upper()}**")
+    st.write(subtemas[subtema]["texto"])
+    
+    preguntas_refuerzo = random.sample(subtemas[subtema]["preguntas"], 4)
+    st.session_state['actual_refuerzo'] = 0
+    st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+    st.session_state['finalizado_refuerzo'] = False
 
-def main():
-    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
+    while st.session_state['actual_refuerzo'] < len(preguntas_refuerzo):
+        p = preguntas_refuerzo[st.session_state['actual_refuerzo']]
+        if p["tipo"] == "opcion":
+            st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
+                p["pregunta"],
+                p["opciones"],
+                key=f"refuerzo_{st.session_state['actual_refuerzo']}"
+            )
+        elif p["tipo"] == "vf":
+            st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
+                p["pregunta"],
+                ["V", "F"],
+                key=f"refuerzo_{st.session_state['actual_refuerzo']}"
+            )
+        elif p["tipo"] == "abierta":
+            st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.text_input(
+                p["pregunta"],
+                key=f"refuerzo_{st.session_state['actual_refuerzo']}"
+            )
 
-    st.write("""
-    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
-
-    👉 Debes responder correctamente al menos 4 de 5 preguntas para avanzar.
-    """)
-
-    # Inicializar estados generales una sola vez
-    for nivel in ["básico", "intermedio", "avanzado"]:
-        st.session_state.setdefault(f'iniciado_{nivel}', False)
-
-    # Selección de tema
-    tema_seleccionado = st.selectbox("Selecciona un tema:", ["retroalimentación", "personalización del aprendizaje"])
-    st.session_state['tema_seleccionado'] = tema_seleccionado  # Guardar el tema seleccionado
-
-    # Botones de inicio
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("Iniciar Nivel BÁSICO"):
-            iniciar_examen("básico")
-    with col2:
-        if st.button("Iniciar Nivel INTERMEDIO"):
-            if st.session_state.get('puntaje_básico', 0) >= 4:
-                iniciar_examen("intermedio")
+        if st.button("Siguiente pregunta", key=f"siguiente_refuerzo_{st.session_state['actual_refuerzo']}"):
+            respuesta_usuario = st.session_state.get(f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}")
+            if respuesta_usuario is not None and respuesta_usuario != "":
+                st.session_state['respuestas_refuerzo'][st.session_state['actual_refuerzo']] = respuesta_usuario
+                st.session_state['actual_refuerzo'] += 1
             else:
-                st.warning("Debes aprobar el nivel BÁSICO primero.")
-    with col3:
-        if st.button("Iniciar Nivel AVANZADO"):
-            if st.session_state.get('puntaje_intermedio', 0) >= 4:
-                iniciar_examen("avanzado")
-            else:
-                st.warning("Debes aprobar el nivel INTERMEDIO primero.")
+                st.warning("Por favor responde antes de continuar.")
 
-    # Mostrar exámenes si se han iniciado
-    if st.session_state['iniciado_básico']:
-        examen_nivel("básico")
-    elif st.session_state['iniciado_intermedio']:
-        examen_nivel("intermedio")
-    elif st.session_state['iniciado_avanzado']:
-        examen_nivel("avanzado")
+    # Calcular puntaje de refuerzo
+    puntaje_refuerzo = 0
+    for i, p in enumerate(preguntas_refuerzo):
+        if p["tipo"] in ["opcion", "vf"]:
+            if st.session_state['respuestas_refuerzo'][i] == p["respuesta"]:
+                puntaje_refuerzo += 1
+        elif p["tipo"] == "abierta":
+            if any(val in st.session_state['respuestas_refuerzo'][i].lower() for val in p["respuesta"]):
+                puntaje_refuerzo += 1
 
-# -------------------------------
-# EJECUTAR APP
-# -------------------------------
-main()
+    st.write(f"📊 Resultado final del refuerzo: {puntaje_refuerzo}/{len(preguntas_refuerzo)}")
+    for i, p in enumerate(preguntas_refuerzo):
+        correcto = False
+        if p["tipo"] in ["opcion", "vf"]:
+            correcto = st.session_state['respuestas_refuerzo'][i] == p["respuesta"]
+        elif p["tipo"] == "abierta":
+            correcto = any(val in st.session_state['respuestas_refuerzo'][i].lower() for val in p["respuesta"])
+
+        if correcto:
+            st.success(f"✅ Pregunta {i+1}: Correcta")
+        else:
+            st.error(f"❌ Pregunta {i+1}: Incorrecta")
+            st.info(f"ℹ️ Explicación: {p['explicacion']}")
+
+   
