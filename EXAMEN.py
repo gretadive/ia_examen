@@ -299,7 +299,8 @@ def realizar_refuerzo(tema):
     st.write(f"🔁 Vamos a reforzar el tema: **{subtema.upper()}**")
     st.write(subtemas[subtema]["texto"])
     
-    preguntas_refuerzo = random.sample(subtemas[subtema]["preguntas"], 4)
+    # Seleccionar preguntas del subtema
+    preguntas_refuerzo = random.sample(subtemas[subtema]["preguntas"], len(subtemas[subtema]["preguntas"]))
     st.session_state['actual_refuerzo'] = 0
     st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
     st.session_state['finalizado_refuerzo'] = False
@@ -314,18 +315,18 @@ def realizar_refuerzo(tema):
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
                 p["pregunta"],
                 p["opciones"],
-                key=key_prefix  # Usar una clave única
+                key=f"{key_prefix}_radio"  # Usar una clave única
             )
         elif p["tipo"] == "vf":
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.radio(
                 p["pregunta"],
                 ["V", "F"],
-                key=key_prefix  # Usar una clave única
+                key=f"{key_prefix}_vf"  # Usar una clave única
             )
         elif p["tipo"] == "abierta":
             st.session_state[f"refuerzo_respuesta_{st.session_state['actual_refuerzo']}"] = st.text_input(
                 p["pregunta"],
-                key=key_prefix  # Usar una clave única
+                key=f"{key_prefix}_text"  # Usar una clave única
             )
 
         if st.button("Siguiente pregunta", key=f"siguiente_refuerzo_{st.session_state['actual_refuerzo']}"):
@@ -359,11 +360,6 @@ def realizar_refuerzo(tema):
         else:
             st.error(f"❌ Pregunta {i+1}: Incorrecta")
             st.info(f"ℹ️ Explicación: {p['explicacion']}")
-
-    # Mostrar recursos si no se aprueba el refuerzo
-    if puntaje_refuerzo < 3:
-        st.warning("❗ No aprobaste el refuerzo. Aquí tienes más recursos:")
-        mostrar_recursos(tema)
 
     # Mostrar recursos si no se aprueba el refuerzo
     if puntaje_refuerzo < 3:
@@ -429,6 +425,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
