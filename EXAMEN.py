@@ -317,6 +317,7 @@ def realizar_refuerzo(tema):
         # Guardar la respuesta en el estado de la sesión
         st.session_state['respuestas_refuerzo'][st.session_state['actual_refuerzo']] = respuesta
 
+        # Botón para avanzar a la siguiente pregunta
         if st.button("Siguiente pregunta"):
             if respuesta is not None and respuesta != "":
                 st.session_state['actual_refuerzo'] += 1
@@ -358,6 +359,7 @@ def realizar_refuerzo(tema):
         if st.button("🔄 Reiniciar Refuerzo"):
             st.session_state['actual_refuerzo'] = 0
             st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+
 
 
 def mostrar_recursos(tema):
@@ -408,6 +410,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
