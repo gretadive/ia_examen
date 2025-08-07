@@ -198,6 +198,14 @@ subtemas = {
 # -----------------------------------
 # FUNCIONES PARA CADA NIVEL DE EXAMEN
 # -----------------------------------
+
+def main():
+    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
+    st.write("""
+    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
+    👉 Debes responder correctamente al menos 4 de 5 preguntas para avanzar.
+    """)
+    
 def iniciar_examen(nivel):
     st.session_state[f'iniciado_{nivel}'] = True
     if f'preguntas_{nivel}' not in st.session_state:
@@ -291,12 +299,7 @@ def examen_nivel(nivel):
 
     return -1  # aún no termina
 
-def main():
-    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
-    st.write("""
-    Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**.
-    👉 Debes responder correctamente al menos 4 de 5 preguntas para avanzar.
-    """)
+
 
 def realizar_refuerzo(tema):
     subtema = "retroalimentación" if tema == "retroalimentación" else "personalización del aprendizaje"
@@ -391,6 +394,7 @@ elif st.session_state.get('iniciado_avanzado', False):
 # -------------------------------
 if __name__ == "__main__":
     main()
+
 
 
 
