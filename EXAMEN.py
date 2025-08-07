@@ -212,6 +212,16 @@ def iniciar_examen(nivel):
         st.session_state[f'actual_{nivel}'] = 0
         st.session_state[f'finalizado_{nivel}'] = False
 
+
+
+def limpiar_examen(nivel):
+    st.session_state[f'iniciado_{nivel}'] = False
+    st.session_state[f'finalizado_{nivel}'] = False
+    st.session_state[f'actual_{nivel}'] = 0
+    st.session_state[f'puntaje_{nivel}'] = 0
+    st.session_state[f'respuestas_{nivel}'] = [None] * 5
+    st.session_state[f'preguntas_{nivel}'] = random.sample(niveles[nivel], 5)
+
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
     actual = st.session_state[f'actual_{nivel}']
@@ -245,6 +255,7 @@ def examen_nivel(nivel):
             if respuesta_usuario:
                 respuestas[actual] = respuesta_usuario
                 st.session_state[f'actual_{nivel}'] += 1
+                st.rerun()
             else:
                 st.warning("Por favor responde antes de continuar.")
 
@@ -277,16 +288,15 @@ def examen_nivel(nivel):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-    if puntaje < 4:
-    st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
-    if st.button("🔁 Reforzamos"):
-        limpiar_examen(nivel)
-        realizar_refuerzo(st.session_state['tema_seleccionado'])
-    if st.button("📚 Ver Recursos"):
-        limpiar_examen(nivel)
-        mostrar_recursos(st.session_state['tema_seleccionado'])
-        
-       else:
+        if puntaje < 4:
+            st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
+            if st.button("🔁 Reforzamos"):
+                limpiar_examen(nivel)
+                realizar_refuerzo(st.session_state['tema_seleccionado'])
+            if st.button("📚 Ver Recursos"):
+                limpiar_examen(nivel)
+                mostrar_recursos(st.session_state['tema_seleccionado'])
+        else:
             if nivel == "básico":
                 if st.button("▶️ Continuar a INTERMEDIO"):
                     iniciar_examen("intermedio")
@@ -395,16 +405,12 @@ def main():
         examen_nivel("intermedio")
     elif st.session_state["iniciado_avanzado"]:
         examen_nivel("avanzado")
-def limpiar_examen(nivel):
-    st.session_state[f'iniciado_{nivel}'] = False
-    st.session_state[f'finalizado_{nivel}'] = False
-    st.session_state[f'actual_{nivel}'] = 0
-    st.session_state[f'puntaje_{nivel}'] = 0
-    st.session_state[f'respuestas_{nivel}'] = [None] * 5
+
 # -------------------------------
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
