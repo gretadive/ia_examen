@@ -223,74 +223,10 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state["nivel_refuerzo"] = nivel
     st.rerun()
 
-def examen_nivel(nivel):
-    preguntas = st.session_state[f'preguntas_{nivel}']
-    actual = st.session_state[f'actual_{nivel}']
-    respuestas = st.session_state[f'respuestas_{nivel}']
-
-    st.progress(int((actual / 5) * 100), text=f"{actual}/5 preguntas respondidas")
-
-    if actual < 5:
-        p = preguntas[actual]
-        key = f"{nivel}_{actual}"
-
-        if p["tipo"] == "opcion":
-            st.session_state[f"{nivel}_respuesta_{actual}"] = st.radio(
-                p["pregunta"], p["opciones"],
-                index=p["opciones"].index(respuestas[actual]) if respuestas[actual] else 0,
-                key=key
-            )
-        elif p["tipo"] == "vf":
-            st.session_state[f"{nivel}_respuesta_{actual}"] = st.radio(
-                p["pregunta"], ["V", "F"],
-                index=["V", "F"].index(respuestas[actual]) if respuestas[actual] else 0,
-                key=key
-            )
-        elif p["tipo"] == "abierta":
-            st.session_state[f"{nivel}_respuesta_{actual}"] = st.text_input(
-                p["pregunta"], value=respuestas[actual] if respuestas[actual] else "", key=key
-            )
-
-        if st.button("Siguiente pregunta", key=f"siguiente_{nivel}_{actual}"):
-            respuesta_usuario = st.session_state.get(f"{nivel}_respuesta_{actual}")
-            if respuesta_usuario:
-                respuestas[actual] = respuesta_usuario
-                st.session_state[f'actual_{nivel}'] += 1
-                st.rerun()
-            else:
-                st.warning("Por favor responde antes de continuar.")
-
-    if st.session_state[f'actual_{nivel}'] >= 5 and not st.session_state[f'finalizado_{nivel}']:
-        puntaje = 0
-        for i, p in enumerate(preguntas):
-            if p["tipo"] in ["opcion", "vf"]:
-                if respuestas[i] == p["respuesta"]:
-                    puntaje += 1
-            elif p["tipo"] == "abierta":
-                if any(val in respuestas[i].lower() for val in p["respuesta"]):
-                    puntaje += 1
-        st.session_state[f'puntaje_{nivel}'] = puntaje
-        st.session_state[f'finalizado_{nivel}'] = True
-
-    if st.session_state[f'finalizado_{nivel}']:
-        tiempo_final = time.time()  # Finalizar el temporizador
-        tiempo_total = tiempo_final - st.session_state[f'tiempo_inicio_{nivel}']
-        st.subheader(f"⏱️ Tiempo total para el nivel {nivel.upper()}: {tiempo_total:.2f} segundos")
-
-        puntaje = st.session_state[f'puntaje_{nivel}']
-        st.subheader(f"📊 Resultado final del nivel {nivel.upper()}: {puntaje}/5")
-        for i, p in enumerate(preguntas):
-            correcto = False
-            if p["tipo"] in ["opcion", "vf"]:
-                correcto = respuestas[i] == p["respuesta"]
-            elif p["tipo"] == "abierta":
-                correcto = any(val in respuestas[i].lower() for val in p["respuesta"])
-            if correcto:
                 st.success(f"✅ Pregunta {i+1}: Correcta")
             else:
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
-
         if puntaje < 4:
             st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
             if st.button("🔁 Reforzamos"):
@@ -304,8 +240,17 @@ def examen_nivel(nivel):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
-
-
+                    
+# Para el temporizador visual
+def temporizador_visual():
+    tiempo_inicio = time.time()
+    while True:
+        tiempo_actual = time.time() - tiempo_inicio
+        tiempo_formateado = format_tiempo(tiempo_actual)
+        st.sidebar.subheader(f"⏳ Temporizador: {tiempo_formateado}")
+        time.sleep(1)  # Actualiza cada segundo
+        if st.session_state.get('finalizado'):
+            break
 
 def realizar_refuerzo(tema):
     subtema = tema
@@ -459,6 +404,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
