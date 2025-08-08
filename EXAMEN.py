@@ -367,18 +367,18 @@ def realizar_refuerzo(tema):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-       if puntaje >= 3:
+        # Corregido: agregado st.rerun() para actualizar la interfaz
+        if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
             if st.button("▶️ Siguiente nivel intermedio"):
                 st.session_state["mostrar"] = None
                 iniciar_examen("intermedio")
-               
+                st.rerun()
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.rerun()
-
                 
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
@@ -444,6 +444,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
