@@ -369,12 +369,14 @@ def realizar_refuerzo(tema):
 
         # Mover el botón FUERA del formulario
         if puntaje >= 3:
-            st.success("🎉 ¡Has aprobado el refuerzo!")
-            st.session_state['refuerzo_aprobado'] = True  # Marcar que se aprobó el refuerzo
-            if st.button("▶️ Continuar al nivel INTERMEDIO"):
-                iniciar_examen("intermedio")  # Iniciar el examen del nivel intermedio
-                st.session_state["mostrar"] = None  # Limpiar el estado de mostrar
-                st.experimental_rerun()  # Reiniciar la aplicación para mostrar el examen
+           st.success("🎉 ¡Has aprobado el refuerzo!")
+           st.session_state['refuerzo_aprobado'] = True
+           if st.button("▶️ Continuar al nivel INTERMEDIO"):
+             iniciar_examen("intermedio")  # Esto activa iniciado_intermedio=True
+             st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
+             st.session_state['refuerzo_aprobado'] = False  # Limpia bandera para futuros intentos
+             st.experimental_rerun()
+
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
@@ -435,6 +437,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
