@@ -380,6 +380,18 @@ def realizar_refuerzo(tema):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
 
+def iniciar_examen_intermedio():
+    if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state['refuerzo_aprobado']:
+        iniciar_examen("intermedio")
+        st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
+    else:
+        st.warning("Debes aprobar el nivel BÁSICO primero.")
+
+def iniciar_examen_avanzado():
+    if st.session_state.get("puntaje_intermedio", 0) >= 4:
+        iniciar_examen("avanzado")
+    else:
+        st.warning("Debes aprobar el nivel INTERMEDIO primero.")
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
     st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
@@ -446,12 +458,19 @@ def main():
         examen_nivel("intermedio")
     elif st.session_state["iniciado_avanzado"]:
         examen_nivel("avanzado")
+# En el flujo principal de la aplicación
+if st.button("🟡 Iniciar INTERMEDIO"):
+    iniciar_examen_intermedio()
+
+if st.button("🔴 Iniciar AVANZADO"):
+    iniciar_examen_avanzado()
 
 
 # -------------------------------
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
