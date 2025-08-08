@@ -1,6 +1,9 @@
 import random
 import time
 import streamlit as st
+from streamlit.components.v1 import html
+import pdfkit
+
 
 # -------------------------------
 # PREGUNTAS POR NIVEL Y TIPO
@@ -228,6 +231,47 @@ def format_tiempo(tiempo_total):
     minutos = int((tiempo_total % 3600) // 60)
     segundos = int(tiempo_total % 60)
     return f"{horas}h {minutos}m {segundos}s"
+def generate_pdf(exam_name, questions, answers, score, explanation):
+    html_content = f"""
+    <html>
+    <head>
+        <title>{exam_name}</title>
+    </head>
+    <body>
+        <h1>Resultado del Examen {exam_name}</h1>
+        <h2>Preguntas y Respuestas</h2>
+        <ul>
+    """
+    for i, q in enumerate(questions):
+        correcto = answers[i] == q["respuesta"]
+        html_content += f"""
+            <li><b>Pregunta {i+1}:</b> {q["pregunta"]}<br>
+            <b>Tu respuesta:</b> {answers[i]}<br>
+            <b>Respuesta correcta:</b> {q["respuesta"]}<br>
+            {'Correcta' if correcto else 'Incorrecta'}<br>
+            <b>Explicación:</b> {q["explicacion"]}<br><br>
+            </li>
+        """
+    html_content += f"""
+        </ul>
+        <h2>Puntaje: {score}/5</h2>
+    </body>
+    </html>
+    """
+    
+    return html_content
+
+def download_pdf(exam_name, questions, answers, score, explanation):
+    html_content = generate_pdf(exam_name, questions, answers, score, explanation)
+    pdf = pdfkit.from_string(html_content, False)
+    with open(f"{exam_name}.pdf", "wb") as f:
+        f.write(pdf)
+    st.download_button(
+        label="Descargar examen como PDF",
+        data=pdf,
+        file_name=f"{exam_name}.pdf",
+        mime="application/pdf",
+    )
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -262,7 +306,7 @@ def examen_nivel(nivel):
             if respuesta_usuario:
                 respuestas[actual] = respuesta_usuario
                 st.session_state[f'actual_{nivel}'] += 1
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.warning("Por favor responde antes de continuar.")
 
@@ -297,6 +341,9 @@ def examen_nivel(nivel):
             else:
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
+
+        if st.session_state[f'finalizado_{nivel}']:
+            download_pdf(f"Examen_{nivel.upper()}", preguntas, respuestas, puntaje, "Explicación de las respuestas")
 
         if puntaje < 4:
             st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
@@ -428,6 +475,7 @@ def mostrar_recursos(tema):
         st.experimental_rerun()  # Volver a cargar la aplicación
 
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
+
 def main():
     st.session_state.setdefault("mostrar", None)
     st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
@@ -451,7 +499,6 @@ def main():
 
     tema = st.selectbox("Selecciona un tema:", list(subtemas.keys()))
     st.session_state['tema_seleccionado'] = tema
-
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("🔴 Iniciar BÁSICO"):
@@ -481,6 +528,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
