@@ -374,7 +374,6 @@ def realizar_refuerzo(tema):
             st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)  # Limpiar respuestas
             st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
             st.session_state["iniciado_intermedio"] = False  # Asegúrate de que no esté iniciado
-            # Redirigir a la página principal
             st.session_state["nivel_seleccionado"] = "intermedio"  # O cualquier lógica que necesites
             return  # Termina la función para que se muestre la página principal
         else:
@@ -382,6 +381,7 @@ def realizar_refuerzo(tema):
             if st.button("🔁 Reiniciar refuerzo"):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
+
 
 
 def mostrar_recursos(tema):
@@ -445,10 +445,12 @@ def main():
     elif st.session_state["iniciado_avanzado"]:
         examen_nivel("avanzado")
 
+
 # -------------------------------
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
