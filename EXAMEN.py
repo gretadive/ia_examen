@@ -231,53 +231,7 @@ def format_tiempo(tiempo_total):
     segundos = int(tiempo_total % 60)
     return f"{horas}h {minutos}m {segundos}s"
     
-def generate_html(exam_name, questions, answers, score):
-    html_content = f"""
-    <html>
-    <head>
-        <title>{exam_name}</title>
-    </head>
-    <body>
-        <h1>Resultado del Examen {exam_name}</h1>
-        <h2>Preguntas y Respuestas</h2>
-        <ul>
-    """
-    for i, q in enumerate(questions):
-        correcto = answers[i] == q["respuesta"]
-        html_content += f"""
-            <li><b>Pregunta {i+1}:</b> {q["pregunta"]}<br>
-            <b>Tu respuesta:</b> {answers[i]}<br>
-            <b>Respuesta correcta:</b> {q["respuesta"]}<br>
-            {'Correcta' if correcto else 'Incorrecta'}<br>
-            <b>Explicación:</b> {q["explicacion"]}<br><br>
-            </li>
-        """
-    html_content += f"""
-        </ul>
-        <h2>Puntaje: {score}/5</h2>
-    </body>
-    </html>
-    """
-    return html_content
 
-def download_html(exam_name, questions, answers, score):
-    html_content = generate_html(exam_name, questions, answers, score)
-    st.download_button(
-        label="Descargar examen como HTML",
-        data=html_content,
-        file_name=f"{exam_name}.html",
-        mime="text/html",
-    )
-
-# Ejemplo de uso
-if st.button("Generar examen"):
-    questions = [
-        {"pregunta": "¿Cuál es la capital de Francia?", "respuesta": "Paris"},
-        {"pregunta": "¿Cuál es el océano más grande?", "respuesta": "Pacífico"}
-    ]
-    answers = ["Paris", "Pacífico"]
-    score = 2
-    download_html("Examen de Prueba", questions, answers, score)
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -534,6 +488,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
