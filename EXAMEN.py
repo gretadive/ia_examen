@@ -2,8 +2,6 @@ import random
 import time
 import streamlit as st
 
-
-
 # -------------------------------
 # PREGUNTAS POR NIVEL Y TIPO
 # -------------------------------
@@ -150,11 +148,11 @@ subtemas = {
         "recursos": {
             "video": {
                 "titulo": "Optimización de Retroalimentación Educativa con IA",
-                "url": "https://us02web.zoom.us/rec/share/Pma546yfdz1OYxpEo3xpt0W_mUw69j_wVDEj7TBynAeS6Tdn9_psfMv2o-6hhasN.NTNu-3Zho_wZ0A_N"
+                "url": "https://us02web.zoom.us/rec/share/Pma546yfdz1OYxpEo3xpt0W_mUw69j_wVDEj7TBynAeS6Tdn9_psfMv2o-6hhasN.NTNu-3Zho_wZ0A_N  "
             },
             "pdf": {
                 "titulo": "Guía Completa de Retroalimentación Formativa",
-                "url": "https://classroom.google.com/c/NzY0ODQwMTMxNzE5/m/Nzg3NzU3NTQxMjM3/details"
+                "url": "https://classroom.google.com/c/NzY0ODQwMTMxNzE5/m/Nzg3NzU3NTQxMjM3/details  "
             }
         }
     },
@@ -190,11 +188,11 @@ subtemas = {
         "recursos": {
             "video": {
                 "titulo": "Personalizando el Aprendizaje con Inteligencia Artificial",
-                "url": "https://us02web.zoom.us/rec/share/AwNC5JTqq_aMxTKYjv8IIHZnNBA6aYtp4fG5Y1vqg8Q_3Li4nkmntfZIxvIvtINd.xATS_XsFmTLeIwK3"
+                "url": "https://us02web.zoom.us/rec/share/AwNC5JTqq_aMxTKYjv8IIHZnNBA6aYtp4fG5Y1vqg8Q_3Li4nkmntfZIxvIvtINd.xATS_XsFmTLeIwK3  "
             },
             "pdf": {
                 "titulo": "Manual de Aprendizaje Adaptativo",
-                "url": "https://docs.google.com/document/d/1ngN7NvlMA13VhDFFT_ZiNrzRi8XwxKXFoStYoExED7o/edit?tab=t.0"
+                "url": "https://docs.google.com/document/d/1ngN7NvlMA13VhDFFT_ZiNrzRi8XwxKXFoStYoExED7o/edit?tab=t.0  "
             }
         }
     }
@@ -223,14 +221,13 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'respuestas_{nivel}'] = [None] * 5
     st.session_state["mostrar"] = accion
     st.session_state["nivel_refuerzo"] = nivel
+    st.rerun()
 
 def format_tiempo(tiempo_total):
     horas = int(tiempo_total // 3600)
     minutos = int((tiempo_total % 3600) // 60)
     segundos = int(tiempo_total % 60)
     return f"{horas}h {minutos}m {segundos}s"
-  
-
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -265,7 +262,7 @@ def examen_nivel(nivel):
             if respuesta_usuario:
                 respuestas[actual] = respuesta_usuario
                 st.session_state[f'actual_{nivel}'] += 1
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.warning("Por favor responde antes de continuar.")
 
@@ -300,9 +297,6 @@ def examen_nivel(nivel):
             else:
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
-
-        if st.session_state[f'finalizado_{nivel}']:
-            download_pdf(f"Examen_{nivel.upper()}", preguntas, respuestas, puntaje, "Explicación de las respuestas")
 
         if puntaje < 4:
             st.warning("❗ No aprobaste el nivel. Aquí tienes más opciones:")
@@ -434,7 +428,6 @@ def mostrar_recursos(tema):
         st.experimental_rerun()  # Volver a cargar la aplicación
 
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
-
 def main():
     st.session_state.setdefault("mostrar", None)
     st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
@@ -458,6 +451,7 @@ def main():
 
     tema = st.selectbox("Selecciona un tema:", list(subtemas.keys()))
     st.session_state['tema_seleccionado'] = tema
+
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("🔴 Iniciar BÁSICO"):
@@ -487,11 +481,6 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
-
-
-
-
-
 
 
 
