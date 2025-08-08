@@ -219,6 +219,17 @@ def mostrar_recursos(tema):
     
     if "pdf" in recursos:
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
+def iniciar_examen(nivel):
+    st.session_state[f'iniciado_{nivel}'] = True
+    for otro in ["básico", "intermedio", "avanzado"]:
+        if otro != nivel:
+            st.session_state[f'iniciado_{otro}'] = False
+    st.session_state[f'preguntas_{nivel}'] = random.sample(niveles[nivel], 5)
+    st.session_state[f'respuestas_{nivel}'] = [None] * 5
+    st.session_state[f'actual_{nivel}'] = 0
+    st.session_state[f'finalizado_{nivel}'] = False
+    st.session_state["mostrar"] = None
+
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -297,6 +308,7 @@ def examen_nivel(nivel):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
+
 
 
 def realizar_refuerzo(tema):
@@ -437,4 +449,5 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
