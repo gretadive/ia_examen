@@ -1,3 +1,4 @@
 pip install streamlit
 pip install streamlit pdfkit reportlab
-
+pip install pdfkit
+brew install wkhtmltopdf
