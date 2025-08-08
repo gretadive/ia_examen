@@ -299,15 +299,14 @@ def examen_nivel(nivel):
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
 
+
 def realizar_refuerzo(tema):
     subtema = tema
     preguntas_refuerzo = subtemas[subtema]["preguntas"]
 
-    # Mostrar título y texto introductorio
     st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
     st.write(subtemas[subtema]["texto"])
 
-    # Inicializar respuestas si aún no existen
     if 'respuestas_refuerzo' not in st.session_state:
         st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
 
@@ -351,7 +350,6 @@ def realizar_refuerzo(tema):
                 if any(val in str(r).lower() for val in p["respuesta"]):
                     puntaje += 1
 
-        # ---------- MOSTRAR NOTA EN LA MISMA PÁGINA ----------
         total_preg = len(preguntas_refuerzo)
         st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{total_preg}")
 
@@ -369,24 +367,16 @@ def realizar_refuerzo(tema):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        # ---------- ACCIÓN TRAS APROBAR ----------
-        if puntaje >= 3:   # Umbral de aprobación
+        if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
-            nivel_anterior = st.session_state.get("nivel_refuerzo", None)
-
-            if nivel_anterior == "básico":
-                if st.button("▶️ Continuar a INTERMEDIO"):
-                    iniciar_examen("intermedio")
-            elif nivel_anterior == "intermedio":
-                if st.button("▶️ Continuar a AVANZADO"):
-                    iniciar_examen("avanzado")
-            else:
-                if st.button("▶️ Volver al inicio"):
-                    st.session_state["mostrar"] = None
-                    st.rerun()
+            if st.button("▶️ Siguiente nivel intermedio"):
+                iniciar_examen("intermedio")
         else:
-            st.warning("📚 Aquí tienes recursos para mejorar:")
-            mostrar_recursos(subtema)
+            st.warning("❌ No aprobaste el refuerzo.")
+            if st.button("🔁 Reiniciar refuerzo"):
+                st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+                st.rerun()
+                
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
     st.subheader("📚 Recursos adicionales")
@@ -404,9 +394,9 @@ def main():
     st.session_state.setdefault("mostrar", None)
 
     if st.session_state["mostrar"] == "refuerzo":
-        tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
-        realizar_refuerzo(tema)
-        return
+      tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
+      realizar_refuerzo(tema)
+    return
 
     if st.session_state["mostrar"] == "recursos":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
@@ -451,6 +441,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
