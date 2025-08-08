@@ -385,7 +385,7 @@ def realizar_refuerzo(tema):
             if correcto:
                 st.success(f"✅ Pregunta {i+1}: Correcta")
             else:
-                                st.error(f"❌ Pregunta {i+1}: Incorrecta")
+                st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
         # Mover el botón FUERA del formulario
@@ -456,3 +456,4 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
