@@ -367,10 +367,12 @@ def realizar_refuerzo(tema):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        if puntaje >= 3:
+       if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
             if st.button("▶️ Siguiente nivel intermedio"):
-                iniciar_examen("intermedio")  # Asegúrate de que esta línea esté aquí
+                st.session_state["mostrar"] = None
+                iniciar_examen("intermedio")
+               
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
@@ -442,6 +444,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
