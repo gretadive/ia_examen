@@ -350,7 +350,7 @@ def realizar_refuerzo(tema):
                 if any(val in str(r).lower() for val in p["respuesta"]):
                     puntaje += 1
 
-                total_preg = len(preguntas_refuerzo)
+        total_preg = len(preguntas_refuerzo)
         st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{total_preg}")
 
         for i, p in enumerate(preguntas_refuerzo):
@@ -367,31 +367,20 @@ def realizar_refuerzo(tema):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        # ✅ Mover el botón FUERA del formulario
+        # Mover el botón FUERA del formulario
         if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
             if st.button("▶️ Siguiente nivel intermedio"):
-                st.session_state["mostrar"] = None
-                iniciar_examen("intermedio")
-                st.rerun()
+                iniciar_examen("intermedio")  # Iniciar el examen del nivel intermedio
+                st.session_state["mostrar"] = None  # Limpiar el estado de mostrar
+                st.rerun()  # Reiniciar la aplicación para mostrar el examen
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.rerun()
-def mostrar_recursos(tema):
-    recursos = subtemas[tema]["recursos"]
-    st.subheader("📚 Recursos adicionales")
-    st.markdown(f"📹 **Video:** [{recursos['video']['titulo']}]({recursos['video']['url']})")
-    st.markdown(f"📄 **PDF:** [{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
-    if st.button("🔙 Volver al inicio"):
-        st.session_state["mostrar"] = None
-        st.rerun()
 
-# -----------------------------------
-# FLUJO PRINCIPAL
-# -----------------------------------
-
+# En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
     st.session_state.setdefault("mostrar", None)
 
@@ -443,9 +432,6 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
-
-
-
 
 
 
