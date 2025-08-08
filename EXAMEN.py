@@ -147,11 +147,11 @@ subtemas = {
         "recursos": {
             "video": {
                 "titulo": "Optimización de Retroalimentación Educativa con IA",
-                "url": "https://www.youtube.com/watch?v=ejemplo1"
+                "url": "https://us02web.zoom.us/rec/share/Pma546yfdz1OYxpEo3xpt0W_mUw69j_wVDEj7TBynAeS6Tdn9_psfMv2o-6hhasN.NTNu-3Zho_wZ0A_N"
             },
             "pdf": {
                 "titulo": "Guía Completa de Retroalimentación Formativa",
-                "url": "https://example.com/retroalimentacion.pdf"
+                "url": "https://classroom.google.com/c/NzY0ODQwMTMxNzE5/m/Nzg3NzU3NTQxMjM3/details"
             }
         }
     },
@@ -187,11 +187,11 @@ subtemas = {
         "recursos": {
             "video": {
                 "titulo": "Personalizando el Aprendizaje con Inteligencia Artificial",
-                "url": "https://www.youtube.com/watch?v=ejemplo2"
+                "url": "https://us02web.zoom.us/rec/share/AwNC5JTqq_aMxTKYjv8IIHZnNBA6aYtp4fG5Y1vqg8Q_3Li4nkmntfZIxvIvtINd.xATS_XsFmTLeIwK3"
             },
             "pdf": {
                 "titulo": "Manual de Aprendizaje Adaptativo",
-                "url": "https://classroom.google.com/w/NzY0ODQwMTMxNzE5/t/all"
+                "url": "https://docs.google.com/document/d/1ngN7NvlMA13VhDFFT_ZiNrzRi8XwxKXFoStYoExED7o/edit?tab=t.0"
             }
         }
     }
@@ -446,6 +446,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
