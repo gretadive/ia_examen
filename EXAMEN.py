@@ -223,6 +223,33 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state["nivel_refuerzo"] = nivel
     st.rerun()
 
+def format_tiempo(tiempo_total):
+    horas = int(tiempo_total // 3600)
+    minutos = int((tiempo_total % 3600) // 60)
+    segundos = int(tiempo_total % 60)
+    return f"{horas}h {minutos}m {segundos}s"
+def examen_nivel(nivel):
+    preguntas = st.session_state[f'preguntas_{nivel}']
+    actual = st.session_state[f'actual_{nivel}']
+    respuestas = st.session_state[f'respuestas_{nivel}']
+    st.progress(int((actual / 5) * 100), text=f"{actual}/5 preguntas respondidas")
+    if actual < 5:
+        p = preguntas[actual]
+        key = f"{nivel}_{actual}"
+        if p["tipo"] == "opcion":
+            st.session_state[f"{nivel}_respuesta_{actual}"] = st.radio(
+                p["pregunta"], p["opciones"],
+                index=p["opciones"].index(respuestas[actual]) if respuestas[actual] else 0,
+                key=key
+            )
+        elif p["tipo"] == "vf":
+                    for i, p in enumerate(preguntas):
+            correcto = False
+            if p["tipo"] in ["opcion", "vf"]:
+                correcto = respuestas[i] == p["respuesta"]
+            elif p["tipo"] == "abierta":
+                correcto = any(val in respuestas[i].lower() for val in p["respuesta"])
+            if correcto:
                 st.success(f"✅ Pregunta {i+1}: Correcta")
             else:
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
@@ -240,6 +267,13 @@ def limpiar_y_redirigir(nivel, accion):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
+
+
+
+
+
+
+
                     
 # Para el temporizador visual
 def temporizador_visual():
@@ -404,6 +438,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
