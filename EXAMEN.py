@@ -309,16 +309,6 @@ def realizar_refuerzo(tema):
 
     if 'respuestas_refuerzo' not in st.session_state:
         st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
-        
-def realizar_refuerzo(tema):
-    subtema = tema
-    preguntas_refuerzo = subtemas[subtema]["preguntas"]
-
-    st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
-    st.write(subtemas[subtema]["texto"])
-
-    if 'respuestas_refuerzo' not in st.session_state:
-        st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
 
     with st.form(key='refuerzo_form'):
         for i, p in enumerate(preguntas_refuerzo):
@@ -384,7 +374,12 @@ def realizar_refuerzo(tema):
             st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)  # Limpiar respuestas
             st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
             st.session_state["iniciado_intermedio"] = False  # Asegúrate de que no esté iniciado
-            st.experimental_rerun()  # Reinicia la aplicación para mostrar la página principal
+            
+            # Manejo de errores al reiniciar
+            try:
+                st.experimental_rerun()  # Reinicia la aplicación para mostrar la página principal
+            except Exception as e:
+                st.error(f"Ocurrió un error al reiniciar: {e}")
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
@@ -458,6 +453,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
