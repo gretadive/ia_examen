@@ -1,4 +1,5 @@
 import random
+import time
 import streamlit as st
 
 # -------------------------------
@@ -202,6 +203,7 @@ subtemas = {
 # --------------------------
 def iniciar_examen(nivel):
     st.session_state[f'iniciado_{nivel}'] = True
+    st.session_state[f'tiempo_inicio_{nivel}'] = time.time()  # Iniciar el temporizador
     for otro in ["básico", "intermedio", "avanzado"]:
         if otro != nivel:
             st.session_state[f'iniciado_{otro}'] = False
@@ -227,7 +229,11 @@ def examen_nivel(nivel):
     respuestas = st.session_state[f'respuestas_{nivel}']
 
     st.progress(int((actual / 5) * 100), text=f"{actual}/5 preguntas respondidas")
-
+    if st.session_state[f'finalizado_{nivel}']:
+        tiempo_final = time.time()  # Finalizar el temporizador
+        tiempo_total = tiempo_final - st.session_state[f'tiempo_inicio_{nivel}']
+        st.subheader(f"⏱️ Tiempo total para el nivel {nivel.upper()}: {tiempo_total:.2f} segundos")
+        
     if actual < 5:
         p = preguntas[actual]
         key = f"{nivel}_{actual}"
@@ -452,6 +458,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
