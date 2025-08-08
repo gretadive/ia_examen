@@ -302,9 +302,12 @@ def examen_nivel(nivel):
 def realizar_refuerzo(tema):
     subtema = tema
     preguntas_refuerzo = subtemas[subtema]["preguntas"]
+
+    # Mostrar título y texto introductorio
     st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
     st.write(subtemas[subtema]["texto"])
 
+    # Inicializar respuestas si aún no existen
     if 'respuestas_refuerzo' not in st.session_state:
         st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
 
@@ -312,11 +315,28 @@ def realizar_refuerzo(tema):
         for i, p in enumerate(preguntas_refuerzo):
             key = f"ref_refuerzo_{i}_{subtema}"
             if p["tipo"] == "opcion":
-                st.session_state['respuestas_refuerzo'][i] = st.radio(p["pregunta"], p["opciones"], index=p["opciones"].index(st.session_state['respuestas_refuerzo'][i]) if st.session_state['respuestas_refuerzo'][i] else 0, key=key)
+                st.session_state['respuestas_refuerzo'][i] = st.radio(
+                    p["pregunta"],
+                    p["opciones"],
+                    index=p["opciones"].index(st.session_state['respuestas_refuerzo'][i])
+                    if st.session_state['respuestas_refuerzo'][i] else 0,
+                    key=key
+                )
             elif p["tipo"] == "vf":
-                st.session_state['respuestas_refuerzo'][i] = st.radio(p["pregunta"], ["V", "F"], index=["V", "F"].index(st.session_state['respuestas_refuerzo'][i]) if st.session_state['respuestas_refuerzo'][i] else 0, key=key)
+                st.session_state['respuestas_refuerzo'][i] = st.radio(
+                    p["pregunta"],
+                    ["V", "F"],
+                    index=["V", "F"].index(st.session_state['respuestas_refuerzo'][i])
+                    if st.session_state['respuestas_refuerzo'][i] else 0,
+                    key=key
+                )
             elif p["tipo"] == "abierta":
-                st.session_state['respuestas_refuerzo'][i] = st.text_input(p["pregunta"], value=st.session_state['respuestas_refuerzo'][i] if st.session_state['respuestas_refuerzo'][i] else "", key=key)
+                st.session_state['respuestas_refuerzo'][i] = st.text_input(
+                    p["pregunta"],
+                    value=st.session_state['respuestas_refuerzo'][i]
+                    if st.session_state['respuestas_refuerzo'][i] else "",
+                    key=key
+                )
 
         submit_button = st.form_submit_button("Enviar Respuestas")
 
@@ -325,38 +345,48 @@ def realizar_refuerzo(tema):
         for i, p in enumerate(preguntas_refuerzo):
             r = st.session_state['respuestas_refuerzo'][i]
             if p["tipo"] in ["opcion", "vf"]:
-                if r == p["respuesta"]:
+                if str(r).strip().upper() == str(p["respuesta"]).strip().upper():
                     puntaje += 1
             elif p["tipo"] == "abierta":
                 if any(val in str(r).lower() for val in p["respuesta"]):
                     puntaje += 1
 
-        st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{len(preguntas_refuerzo)}")
+        # ---------- MOSTRAR NOTA EN LA MISMA PÁGINA ----------
+        total_preg = len(preguntas_refuerzo)
+        st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{total_preg}")
+
         for i, p in enumerate(preguntas_refuerzo):
             r = st.session_state['respuestas_refuerzo'][i]
             correcto = False
             if p["tipo"] in ["opcion", "vf"]:
-                correcto = r == p["respuesta"]
+                correcto = str(r).strip().upper() == str(p["respuesta"]).strip().upper()
             elif p["tipo"] == "abierta":
                 correcto = any(val in str(r).lower() for val in p["respuesta"])
+
             if correcto:
                 st.success(f"✅ Pregunta {i+1}: Correcta")
             else:
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        if puntaje < 3:
+        # ---------- ACCIÓN TRAS APROBAR ----------
+        if puntaje >= 3:   # Umbral de aprobación
             st.success("🎉 ¡Has aprobado el refuerzo!")
             nivel_anterior = st.session_state.get("nivel_refuerzo", None)
 
             if nivel_anterior == "básico":
-             iniciar_examen("intermedio")
+                if st.button("▶️ Continuar a INTERMEDIO"):
+                    iniciar_examen("intermedio")
             elif nivel_anterior == "intermedio":
-             iniciar_examen("avanzado")
+                if st.button("▶️ Continuar a AVANZADO"):
+                    iniciar_examen("avanzado")
             else:
-             st.session_state["mostrar"] = None
-             st.rerun()
-
+                if st.button("▶️ Volver al inicio"):
+                    st.session_state["mostrar"] = None
+                    st.rerun()
+        else:
+            st.warning("📚 Aquí tienes recursos para mejorar:")
+            mostrar_recursos(subtema)
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
     st.subheader("📚 Recursos adicionales")
@@ -421,6 +451,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
