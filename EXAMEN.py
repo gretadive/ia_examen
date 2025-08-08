@@ -393,7 +393,7 @@ def mostrar_recursos(tema):
     
     # Mostrar PDF si está disponible
     if "pdf" in recursos:
-        st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
+        st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
        
 
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
