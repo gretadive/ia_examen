@@ -388,11 +388,13 @@ def mostrar_recursos(tema):
     
     # Mostrar video como enlace de texto si está disponible
     if "video" in recursos:
+        st.write("VER VIDEO")
         st.markdown(f"[{recursos['video']['titulo']}]({recursos['video']['url']})")  # Enlace de Zoom
         
     
     # Mostrar PDF si está disponible
     if "pdf" in recursos:
+        st.write("VER LECTURA")
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
        
 
@@ -450,6 +452,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
