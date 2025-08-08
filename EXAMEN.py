@@ -417,7 +417,6 @@ def mostrar_recursos(tema):
         st.write("VER VIDEO")
         st.markdown(f"[{recursos['video']['titulo']}]({recursos['video']['url']})")  # Enlace de Zoom
         
-    
     # Mostrar PDF si está disponible
     if "pdf" in recursos:
         st.write("VER LECTURA")
@@ -427,7 +426,6 @@ def mostrar_recursos(tema):
     if st.button("🔙 Volver"):
         st.session_state["mostrar"] = None  # Reiniciar la variable de estado
         st.experimental_rerun()  # Volver a cargar la aplicación
-       
 
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
@@ -483,37 +481,6 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
