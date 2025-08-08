@@ -229,11 +229,7 @@ def examen_nivel(nivel):
     respuestas = st.session_state[f'respuestas_{nivel}']
 
     st.progress(int((actual / 5) * 100), text=f"{actual}/5 preguntas respondidas")
-    if st.session_state[f'finalizado_{nivel}']:
-        tiempo_final = time.time()  # Finalizar el temporizador
-        tiempo_total = tiempo_final - st.session_state[f'tiempo_inicio_{nivel}']
-        st.subheader(f"⏱️ Tiempo total para el nivel {nivel.upper()}: {tiempo_total:.2f} segundos")
-        
+
     if actual < 5:
         p = preguntas[actual]
         key = f"{nivel}_{actual}"
@@ -277,6 +273,10 @@ def examen_nivel(nivel):
         st.session_state[f'finalizado_{nivel}'] = True
 
     if st.session_state[f'finalizado_{nivel}']:
+        tiempo_final = time.time()  # Finalizar el temporizador
+        tiempo_total = tiempo_final - st.session_state[f'tiempo_inicio_{nivel}']
+        st.subheader(f"⏱️ Tiempo total para el nivel {nivel.upper()}: {tiempo_total:.2f} segundos")
+
         puntaje = st.session_state[f'puntaje_{nivel}']
         st.subheader(f"📊 Resultado final del nivel {nivel.upper()}: {puntaje}/5")
         for i, p in enumerate(preguntas):
@@ -304,6 +304,7 @@ def examen_nivel(nivel):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
+
 
 
 def realizar_refuerzo(tema):
@@ -458,6 +459,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
