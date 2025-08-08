@@ -383,7 +383,86 @@ def realizar_refuerzo(tema):
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
 
 
-# En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
+def examen_nivel_intermedio():
+    # Aquí va la lógica para el examen del nivel intermedio
+    st.subheader("📚 Examen Nivel INTERMEDIO")
+    # Lógica para mostrar preguntas del nivel intermedio
+    # Similar a la función examen_nivel, pero para el nivel intermedio
+
+    preguntas = st.session_state['preguntas_intermedio']
+    actual = st.session_state['actual_intermedio']
+    respuestas = st.session_state['respuestas_intermedio']
+
+    st.progress(int((actual / len(preguntas)) * 100), text=f"{actual}/{len(preguntas)} preguntas respondidas")
+
+    if actual < len(preguntas):
+        p = preguntas[actual]
+        key = f"intermedio_{actual}"
+
+        if p["tipo"] == "opcion":
+            st.session_state[f"intermedio_respuesta_{actual}"] = st.radio(
+                p["pregunta"], p["opciones"],
+                index=p["opciones"].index(respuestas[actual]) if respuestas[actual] else 0,
+                key=key
+            )
+        elif p["tipo"] == "vf":
+            st.session_state[f"intermedio_respuesta_{actual}"] = st.radio(
+                p["pregunta"], ["V", "F"],
+                index=["V", "F"].index(respuestas[actual]) if respuestas[actual] else 0,
+                key=key
+            )
+        elif p["tipo"] == "abierta":
+            st.session_state[f"intermedio_respuesta_{actual}"] = st.text_input(
+                p["pregunta"], value=respuestas[actual] if respuestas[actual] else "", key=key
+            )
+
+        if st.button("Siguiente pregunta", key=f"siguiente_intermedio"):
+            respuesta_usuario = st.session_state.get(f"intermedio_respuesta_{actual}")
+            if respuesta_usuario:
+                respuestas[actual] = respuesta_usuario
+                st.session_state['actual_intermedio'] += 1
+                st.experimental_rerun()
+            else:
+                st.warning("Por favor responde antes de continuar.")
+
+    if st.session_state['actual_intermedio'] >= len(preguntas):
+        # Calcular puntaje y mostrar resultados
+        puntaje = 0
+        for i, p in enumerate(preguntas):
+            if p["tipo"] in ["opcion", "vf"]:
+                if respuestas[i] == p["respuesta"]:
+                    puntaje += 1
+            elif p["tipo"] == "abierta":
+                if any(val in respuestas[i].lower() for val in p["respuesta"]):
+                    puntaje += 1
+        st.session_state['puntaje_intermedio'] = puntaje
+        st.session_state['finalizado_intermedio'] = True
+
+    if st.session_state.get('finalizado_intermedio', False):
+        puntaje = st.session_state['puntaje_intermedio']
+        st.subheader(f"📊 Resultado final del nivel INTERMEDIO: {puntaje}/{len(preguntas)}")
+        for i, p in enumerate(preguntas):
+            correcto = False
+            if p["tipo"] in ["opcion", "vf"]:
+                correcto = respuestas[i] == p["respuesta"]
+            elif p["tipo"] == "abierta":
+                correcto = any(val in respuestas[i].lower() for val in p["respuesta"])
+            if correcto:
+                st.success(f"✅ Pregunta {i+1}: Correcta")
+            else:
+                st.error(f"❌ Pregunta {i+1}: Incorrecta")
+                st.info(f"ℹ️ Explicación: {p['explicacion']}")
+
+        if puntaje < 4:
+            st.warning("❗ No aprobaste el nivel INTERMEDIO. Aquí tienes más opciones:")
+            if st.button("🔁 Reforzamos"):
+                limpiar_y_redirigir("intermedio", "refuerzo")
+            if st.button("📚 Ver Recursos"):
+                limpiar_y_redirigir("intermedio", "recursos")
+        else:
+            if st.button("▶️ Continuar a AVANZADO"):
+                iniciar_examen("avanzado")
+
 def main():
     st.session_state.setdefault("mostrar", None)
     st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
@@ -396,6 +475,10 @@ def main():
     if st.session_state["mostrar"] == "recursos":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
         mostrar_recursos(tema)
+        return
+
+    if st.session_state["mostrar"] == "examen_intermedio":
+        examen_nivel_intermedio()
         return
 
     # Solo se muestra si no está en refuerzo ni recursos
@@ -415,8 +498,11 @@ def main():
     with col2:
         if st.button("🟡 Iniciar INTERMEDIO"):
             if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state['refuerzo_aprobado']:
-                iniciar_examen("intermedio")
-                st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
+                st.session_state["mostrar"] = "examen_intermedio"  # Cambiar el estado para mostrar el examen intermedio
+                st.session_state['actual_intermedio'] = 0  # Reiniciar el contador de preguntas
+                st.session_state['preguntas_intermedio'] = random.sample(niveles["intermedio"], 5)  # Seleccionar preguntas
+                st.session_state['respuestas_intermedio'] = [None] * 5  # Inicializar respuestas
+                st.experimental_rerun()  # Reiniciar para mostrar el examen
             else:
                 st.warning("Debes aprobar el nivel BÁSICO primero.")
     with col3:
