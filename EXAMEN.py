@@ -382,7 +382,17 @@ def realizar_refuerzo(tema):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
 
-
+def mostrar_recursos(tema):
+    recursos = subtemas[tema]["recursos"]
+    st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
+    
+    if "video" in recursos:
+        st.video(recursos["video"]["url"], start_time=0)
+        st.write(f"**{recursos['video']['titulo']}**")
+    
+    if "pdf" in recursos:
+        st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
+        
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
     st.session_state.setdefault("mostrar", None)
@@ -437,6 +447,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
