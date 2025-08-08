@@ -300,93 +300,89 @@ def examen_nivel(nivel):
                     iniciar_examen("avanzado")
 
 
-def realizar_refuerzo(tema):
-    subtema = tema
-    preguntas_refuerzo = subtemas[subtema]["preguntas"]
+   def realizar_refuerzo(tema):
+       subtema = tema
+       preguntas_refuerzo = subtemas[subtema]["preguntas"]
 
-    st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
-    st.write(subtemas[subtema]["texto"])
+       st.subheader(f"🔁 Refuerzo del tema: {subtema.upper()}")
+       st.write(subtemas[subtema]["texto"])
 
-    if 'respuestas_refuerzo' not in st.session_state:
-        st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+       if 'respuestas_refuerzo' not in st.session_state:
+           st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
 
-    with st.form(key='refuerzo_form'):
-        for i, p in enumerate(preguntas_refuerzo):
-            key = f"ref_refuerzo_{i}_{subtema}"
-            if p["tipo"] == "opcion":
-                st.session_state['respuestas_refuerzo'][i] = st.radio(
-                    p["pregunta"],
-                    p["opciones"],
-                    index=p["opciones"].index(st.session_state['respuestas_refuerzo'][i])
-                    if st.session_state['respuestas_refuerzo'][i] else 0,
-                    key=key
-                )
-            elif p["tipo"] == "vf":
-                st.session_state['respuestas_refuerzo'][i] = st.radio(
-                    p["pregunta"],
-                    ["V", "F"],
-                    index=["V", "F"].index(st.session_state['respuestas_refuerzo'][i])
-                    if st.session_state['respuestas_refuerzo'][i] else 0,
-                    key=key
-                )
-            elif p["tipo"] == "abierta":
-                st.session_state['respuestas_refuerzo'][i] = st.text_input(
-                    p["pregunta"],
-                    value=st.session_state['respuestas_refuerzo'][i]
-                    if st.session_state['respuestas_refuerzo'][i] else "",
-                    key=key
-                )
+       with st.form(key='refuerzo_form'):
+           for i, p in enumerate(preguntas_refuerzo):
+               key = f"ref_refuerzo_{i}_{subtema}"
+               if p["tipo"] == "opcion":
+                   st.session_state['respuestas_refuerzo'][i] = st.radio(
+                       p["pregunta"],
+                       p["opciones"],
+                       index=p["opciones"].index(st.session_state['respuestas_refuerzo'][i])
+                       if st.session_state['respuestas_refuerzo'][i] else 0,
+                       key=key
+                   )
+               elif p["tipo"] == "vf":
+                   st.session_state['respuestas_refuerzo'][i] = st.radio(
+                       p["pregunta"],
+                       ["V", "F"],
+                       index=["V", "F"].index(st.session_state['respuestas_refuerzo'][i])
+                       if st.session_state['respuestas_refuerzo'][i] else 0,
+                       key=key
+                   )
+               elif p["tipo"] == "abierta":
+                   st.session_state['respuestas_refuerzo'][i] = st.text_input(
+                       p["pregunta"],
+                       value=st.session_state['respuestas_refuerzo'][i]
+                       if st.session_state['respuestas_refuerzo'][i] else "",
+                       key=key
+                   )
 
-        submit_button = st.form_submit_button("Enviar Respuestas")
+           submit_button = st.form_submit_button("Enviar Respuestas")
 
-    if submit_button:
-        puntaje = 0
-        for i, p in enumerate(preguntas_refuerzo):
-            r = st.session_state['respuestas_refuerzo'][i]
-            if p["tipo"] in ["opcion", "vf"]:
-                if str(r).strip().upper() == str(p["respuesta"]).strip().upper():
-                    puntaje += 1
-            elif p["tipo"] == "abierta":
-                if any(val in str(r).lower() for val in p["respuesta"]):
-                    puntaje += 1
+       if submit_button:
+           puntaje = 0
+           for i, p in enumerate(preguntas_refuerzo):
+               r = st.session_state['respuestas_refuerzo'][i]
+               if p["tipo"] in ["opcion", "vf"]:
+                   if str(r).strip().upper() == str(p["respuesta"]).strip().upper():
+                       puntaje += 1
+               elif p["tipo"] == "abierta":
+                   if any(val in str(r).lower() for val in p["respuesta"]):
+                       puntaje += 1
 
-        total_preg = len(preguntas_refuerzo)
-        st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{total_preg}")
+           total_preg = len(preguntas_refuerzo)
+           st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{total_preg}")
 
-        for i, p in enumerate(preguntas_refuerzo):
-            r = st.session_state['respuestas_refuerzo'][i]
-            correcto = False
-            if p["tipo"] in ["opcion", "vf"]:
-                correcto = str(r).strip().upper() == str(p["respuesta"]).strip().upper()
-            elif p["tipo"] == "abierta":
-                correcto = any(val in str(r).lower() for val in p["respuesta"])
+           for i, p in enumerate(preguntas_refuerzo):
+               r = st.session_state['respuestas_refuerzo'][i]
+               correcto = False
+               if p["tipo"] in ["opcion", "vf"]:
+                   correcto = str(r).strip().upper() == str(p["respuesta"]).strip().upper()
+               elif p["tipo"] == "abierta":
+                   correcto = any(val in str(r).lower() for val in p["respuesta"])
 
-            if correcto:
-                st.success(f"✅ Pregunta {i+1}: Correcta")
-            else:
-                st.error(f"❌ Pregunta {i+1}: Incorrecta")
-                st.info(f"ℹ️ Explicación: {p['explicacion']}")
+               if correcto:
+                   st.success(f"✅ Pregunta {i+1}: Correcta")
+               else:
+                   st.error(f"❌ Pregunta {i+1}: Incorrecta")
+                   st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
-        # Mover el botón FUERA del formulario
-        if puntaje >= 3:
-            st.success("🎉 ¡Has aprobado el refuerzo!")
-            st.session_state['refuerzo_aprobado'] = True
-            st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)  # Limpiar respuestas
-            st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
-            st.session_state["iniciado_intermedio"] = False  # Asegúrate de que no esté iniciado
-            
-            # Manejo de errores al reiniciar
-            try:
-                st.experimental_rerun()  # Reinicia la aplicación para mostrar la página principal
-            except Exception as e:
-                st.error(f"Ocurrió un error al reiniciar: {e}")
-        else:
-            st.warning("❌ No aprobaste el refuerzo.")
-            if st.button("🔁 Reiniciar refuerzo"):
-                st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
-                st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
-
-
+           # Mover el botón FUERA del formulario
+           if puntaje >= 3:
+               st.success("🎉 ¡Has aprobado el refuerzo!")
+               st.session_state['refuerzo_aprobado'] = True
+               st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)  # Limpiar respuestas
+               st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
+               st.session_state["iniciado_intermedio"] = False  # Asegúrate de que no esté iniciado
+               # Redirigir a la página principal
+               st.session_state["nivel_seleccionado"] = "intermedio"  # O cualquier lógica que necesites
+               return  # Termina la función para que se muestre la página principal
+           else:
+               st.warning("❌ No aprobaste el refuerzo.")
+               if st.button("🔁 Reiniciar refuerzo"):
+                   st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+                   st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
+   
 
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
@@ -453,6 +449,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
