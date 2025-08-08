@@ -223,14 +223,13 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'respuestas_{nivel}'] = [None] * 5
     st.session_state["mostrar"] = accion
     st.session_state["nivel_refuerzo"] = nivel
-    st.rerun()
 
 def format_tiempo(tiempo_total):
     horas = int(tiempo_total // 3600)
     minutos = int((tiempo_total % 3600) // 60)
     segundos = int(tiempo_total % 60)
     return f"{horas}h {minutos}m {segundos}s"
-    
+  
 
 
 def examen_nivel(nivel):
@@ -488,6 +487,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
