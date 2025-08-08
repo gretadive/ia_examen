@@ -122,7 +122,7 @@ subtemas = {
                 "tipo": "opcion",
                 "pregunta": "¿Qué caracteriza a una retroalimentación efectiva?",
                 "opciones": ["A. Ser vaga", "B. Ser específica y constructiva", "C. Ser solo positiva", "D. No ser oportuna"],
-                "respuesta": "B",
+                "respuesta": "B. Ser específica y constructiva",
                 "explicacion": "La retroalimentación efectiva debe ser específica y constructiva."
             },
             {
@@ -212,7 +212,6 @@ def iniciar_examen(nivel):
     st.session_state["mostrar"] = None
 
 def limpiar_y_redirigir(nivel, accion):
-    # Limpiar el estado de la sesión para el nivel especificado
     st.session_state[f'iniciado_{nivel}'] = False
     st.session_state[f'finalizado_{nivel}'] = False
     st.session_state[f'actual_{nivel}'] = 0
@@ -220,17 +219,12 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'respuestas_{nivel}'] = [None] * 5
     st.session_state["mostrar"] = accion
     st.session_state["nivel_refuerzo"] = nivel
-
-    # Redirigir a la pantalla correspondiente
-    try:
-        st.experimental_rerun()  # Reiniciar la aplicación para mostrar la nueva pantalla
-    except AttributeError:
-        st.error("Error al intentar reiniciar la aplicación. Asegúrate de que estás usando una versión compatible de Streamlit.")
+    st.rerun()
 
 def examen_nivel(nivel):
-    preguntas = st.session_state.get(f'preguntas_{nivel}', [])
-    actual = st.session_state.get(f'actual_{nivel}', 0)
-    respuestas = st.session_state.get(f'respuestas_{nivel}', [None] * 5)
+    preguntas = st.session_state[f'preguntas_{nivel}']
+    actual = st.session_state[f'actual_{nivel}']
+    respuestas = st.session_state[f'respuestas_{nivel}']
 
     st.progress(int((actual / 5) * 100), text=f"{actual}/5 preguntas respondidas")
 
@@ -260,11 +254,11 @@ def examen_nivel(nivel):
             if respuesta_usuario:
                 respuestas[actual] = respuesta_usuario
                 st.session_state[f'actual_{nivel}'] += 1
-                st.session_state[f'respuestas_{nivel}'] = respuestas
+                st.rerun()
             else:
                 st.warning("Por favor responde antes de continuar.")
 
-    if st.session_state.get(f'actual_{nivel}', 0) >= 5 and not st.session_state.get(f'finalizado_{nivel}', False):
+    if st.session_state[f'actual_{nivel}'] >= 5 and not st.session_state[f'finalizado_{nivel}']:
         puntaje = 0
         for i, p in enumerate(preguntas):
             if p["tipo"] in ["opcion", "vf"]:
@@ -276,7 +270,7 @@ def examen_nivel(nivel):
         st.session_state[f'puntaje_{nivel}'] = puntaje
         st.session_state[f'finalizado_{nivel}'] = True
 
-    if st.session_state.get(f'finalizado_{nivel}', False):
+    if st.session_state[f'finalizado_{nivel}']:
         puntaje = st.session_state[f'puntaje_{nivel}']
         st.subheader(f"📊 Resultado final del nivel {nivel.upper()}: {puntaje}/5")
         for i, p in enumerate(preguntas):
@@ -304,6 +298,7 @@ def examen_nivel(nivel):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
+
 
 def realizar_refuerzo(tema):
     subtema = tema
@@ -376,7 +371,11 @@ def realizar_refuerzo(tema):
         if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
             st.session_state['refuerzo_aprobado'] = True
-            limpiar_y_redirigir("intermedio", None)  # Redirigir a intermedio
+            if st.button("▶️ Continuar al nivel INTERMEDIO"):
+                iniciar_examen("intermedio")  # Esto activa iniciado_intermedio=True
+                st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
+                st.session_state['refuerzo_aprobado'] = False  # Limpia bandera para futuros intentos
+                st.experimental_rerun()
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
@@ -393,65 +392,60 @@ def mostrar_recursos(tema):
     
     if "pdf" in recursos:
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
-
+# En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
-    if st.session_state.get("mostrar") == "refuerzo":
+    st.session_state.setdefault("mostrar", None)
+    st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
+
+    if st.session_state["mostrar"] == "refuerzo":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
         realizar_refuerzo(tema)
-    elif st.session_state.get("mostrar") == "recursos":
+        return  # Mover el return aquí para que no interrumpa el flujo
+
+    if st.session_state["mostrar"] == "recursos":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
         mostrar_recursos(tema)
-    else:
-        # Lógica para mostrar la pantalla principal
-        st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
-        st.markdown("Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**. Debes aprobar con 4/5 para avanzar.")
+        return
 
-        tema = st.selectbox("Selecciona un tema:", list(subtemas.keys()))
-        st.session_state['tema_seleccionado'] = tema
+    # Solo se muestra si no está en refuerzo ni recursos
+    st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
+    st.markdown("Este examen tiene tres niveles: **BÁSICO**, **INTERMEDIO** y **AVANZADO**. Debes aprobar con 4/5 para avanzar.")
 
-        col1, col2, col3 = st.columns(3)
+    for nivel in ["básico", "intermedio", "avanzado"]:
+        st.session_state.setdefault(f'iniciado_{nivel}', False)
 
-        # Botón para iniciar el nivel BÁSICO
-        with col1:
-            if st.button("🟢 Iniciar BÁSICO"):
-                iniciar_examen("básico")
+    tema = st.selectbox("Selecciona un tema:", list(subtemas.keys()))
+    st.session_state['tema_seleccionado'] = tema
 
-        # Botón para iniciar el nivel INTERMEDIO
-        with col2:
-            if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state.get('refuerzo_aprobado', False):
-                if st.button("🟡 Iniciar INTERMEDIO"):
-                    iniciar_examen("intermedio")
-                    st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🟢 Iniciar BÁSICO"):
+            iniciar_examen("básico")
+    with col2:
+        if st.button("🟡 Iniciar INTERMEDIO"):
+            if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state['refuerzo_aprobado']:
+                iniciar_examen("intermedio")
+                st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
             else:
                 st.warning("Debes aprobar el nivel BÁSICO primero.")
-
-        # Botón para iniciar el nivel AVANZADO
-        with col3:
+    with col3:
+        if st.button("🔴 Iniciar AVANZADO"):
             if st.session_state.get("puntaje_intermedio", 0) >= 4:
-                if st.button("🔴 Iniciar AVANZADO"):
-                    iniciar_examen("avanzado")
+                iniciar_examen("avanzado")
             else:
                 st.warning("Debes aprobar el nivel INTERMEDIO primero.")
 
-        # Lógica para iniciar el examen del nivel intermedio si se ha aprobado el refuerzo
-        if st.session_state.get("nivel_seleccionado") == "intermedio":
-            iniciar_examen("intermedio")
-            st.session_state["nivel_seleccionado"] = None  # Reiniciar la selección de nivel
-
-        if st.session_state.get("iniciado_básico"):
-            examen_nivel("básico")
-        elif st.session_state.get("iniciado_intermedio"):
-            examen_nivel("intermedio")
-        elif st.session_state.get("iniciado_avanzado"):
-            examen_nivel("avanzado")
+    if st.session_state["iniciado_básico"]:
+        examen_nivel("básico")
+    elif st.session_state["iniciado_intermedio"]:
+        examen_nivel("intermedio")
+    elif st.session_state["iniciado_avanzado"]:
+        examen_nivel("avanzado")
 
 # -------------------------------
 # EJECUTAR APP
 # -------------------------------
-if __name__ == "__main__":
-    main()
-
-
+main()
 
 
 
