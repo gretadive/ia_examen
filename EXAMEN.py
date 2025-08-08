@@ -220,6 +220,8 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'respuestas_{nivel}'] = [None] * 5
     st.session_state["mostrar"] = accion
     st.session_state["nivel_refuerzo"] = nivel
+    # No usar rerun, simplemente permitir que la lógica de la aplicación maneje la visualización
+
     
     # Redirigir a la pantalla correspondiente
     try:
@@ -376,9 +378,10 @@ def realizar_refuerzo(tema):
 
       # Mover el botón FUERA del formulario
         if puntaje >= 3:
-            st.success("🎉 ¡Has aprobado el refuerzo!")
-            st.session_state['refuerzo_aprobado'] = True
-            limpiar_y_redirigir("intermedio", None)  # Redirigir a intermedio
+           st.success("🎉 ¡Has aprobado el refuerzo!")
+           st.session_state['refuerzo_aprobado'] = True
+           limpiar_y_redirigir("intermedio", None)  # Redirigir a intermedio
+
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
@@ -401,20 +404,16 @@ def mostrar_recursos(tema):
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 
 def main():
-    st.session_state.setdefault("mostrar", None)
-    st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
-    st.session_state.setdefault("puntaje_básico", 0)  # Inicializar puntaje básico
-    st.session_state.setdefault("puntaje_intermedio", 0)  # Inicializar puntaje intermedio
-
     if st.session_state["mostrar"] == "refuerzo":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
         realizar_refuerzo(tema)
-        return  # Mover el return aquí para que no interrumpa el flujo
-
-    if st.session_state["mostrar"] == "recursos":
+    elif st.session_state["mostrar"] == "recursos":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
         mostrar_recursos(tema)
-        return
+    else:
+        # Lógica para mostrar la pantalla principal
+        mostrar_pantalla_principal()
+
 
     # Solo se muestra si no está en refuerzo ni recursos
     st.title("🎓 EXAMEN ADAPTATIVO: Evaluación Formativa con IA")
@@ -464,6 +463,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
