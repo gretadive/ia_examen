@@ -228,9 +228,9 @@ def limpiar_y_redirigir(nivel, accion):
         st.error("Error al intentar reiniciar la aplicación. Asegúrate de que estás usando una versión compatible de Streamlit.")
 
 def examen_nivel(nivel):
-    preguntas = st.session_state[f'preguntas_{nivel}']
-    actual = st.session_state[f'actual_{nivel}']
-    respuestas = st.session_state[f'respuestas_{nivel}']
+    preguntas = st.session_state.get(f'preguntas_{nivel}', [])
+    actual = st.session_state.get(f'actual_{nivel}', 0)
+    respuestas = st.session_state.get(f'respuestas_{nivel}', [None] * 5)
 
     st.progress(int((actual / 5) * 100), text=f"{actual}/5 preguntas respondidas")
 
@@ -260,11 +260,12 @@ def examen_nivel(nivel):
             if respuesta_usuario:
                 respuestas[actual] = respuesta_usuario
                 st.session_state[f'actual_{nivel}'] += 1
-                st.experimental_rerun()  # Cambiado de st.rerun() a st.experimental_rerun()
+                # No usar rerun aquí, simplemente actualizar el estado
+                st.session_state[f'respuestas_{nivel}'] = respuestas
             else:
                 st.warning("Por favor responde antes de continuar.")
 
-    if st.session_state[f'actual_{nivel}'] >= 5 and not st.session_state[f'finalizado_{nivel}']:
+    if st.session_state.get(f'actual_{nivel}', 0) >= 5 and not st.session_state.get(f'finalizado_{nivel}', False):
         puntaje = 0
         for i, p in enumerate(preguntas):
             if p["tipo"] in ["opcion", "vf"]:
@@ -276,7 +277,7 @@ def examen_nivel(nivel):
         st.session_state[f'puntaje_{nivel}'] = puntaje
         st.session_state[f'finalizado_{nivel}'] = True
 
-    if st.session_state[f'finalizado_{nivel}']:
+    if st.session_state.get(f'finalizado_{nivel}', False):
         puntaje = st.session_state[f'puntaje_{nivel}']
         st.subheader(f"📊 Resultado final del nivel {nivel.upper()}: {puntaje}/5")
         for i, p in enumerate(preguntas):
@@ -304,6 +305,7 @@ def examen_nivel(nivel):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
+
 
 def realizar_refuerzo(tema):
     subtema = tema
@@ -450,6 +452,7 @@ def main():
 # -------------------------------
 if __name__ == "__main__":
     main()
+
 
 
 
