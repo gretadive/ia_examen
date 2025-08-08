@@ -11,14 +11,14 @@ niveles = {
             "tipo": "opcion",
             "pregunta": "¿Cuál es una ventaja de la evaluación formativa con IA?",
             "opciones": ["A. Castigar errores", "B. Promover la memorización", "C. Dar retroalimentación inmediata", "D. Eliminar al docente"],
-            "respuesta": "C",
+            "respuesta": "C. Dar retroalimentación inmediata",
             "explicacion": "La IA permite dar retroalimentación inmediata, lo cual es clave en la evaluación formativa."
         },
         {
             "tipo": "opcion",
             "pregunta": "¿Qué permite la evaluación formativa?",
             "opciones": ["A. Evaluar solo al final", "B. Ayudar al aprendizaje durante el proceso", "C. Hacer exámenes sorpresa", "D. Reprobar al estudiante"],
-            "respuesta": "B",
+            "respuesta": "B. Ayudar al aprendizaje durante el proceso",
             "explicacion": "La evaluación formativa busca mejorar el aprendizaje en tiempo real."
         },
         {
@@ -45,14 +45,14 @@ niveles = {
             "tipo": "opcion",
             "pregunta": "¿Cómo puede usarse la IA para personalizar la enseñanza?",
             "opciones": ["A. Haciendo exámenes aleatorios", "B. Detectando el estilo de aprendizaje del estudiante", "C. Asignando tareas iguales para todos", "D. Usando robots"],
-            "respuesta": "B",
+            "respuesta": "B. Detectando el estilo de aprendizaje del estudiante",
             "explicacion": "La IA puede detectar estilos de aprendizaje y adaptar el contenido."
         },
         {
             "tipo": "opcion",
             "pregunta": "¿Qué ventaja ofrece la analítica de aprendizaje con IA?",
             "opciones": ["A. Aumenta la carga docente", "B. Predice el rendimiento estudiantil", "C. Crea exámenes más difíciles", "D. Reduce la retroalimentación"],
-            "respuesta": "B",
+            "respuesta": "B. Predice el rendimiento estudiantil",
             "explicacion": "La analítica puede predecir el rendimiento y detectar dificultades."
         },
         {
@@ -79,14 +79,14 @@ niveles = {
             "tipo": "opcion",
             "pregunta": "¿Cuál de los siguientes no es un riesgo ético de la IA en educación?",
             "opciones": ["A. Sesgos algorítmicos", "B. Violación de privacidad", "C. Retroalimentación", "D. Desigualdad en el acceso"],
-            "respuesta": "C",
+            "respuesta": "C. Retroalimentación",
             "explicacion": "La retroalimentación no es un riesgo, es una ventaja."
         },
         {
             "tipo": "opcion",
             "pregunta": "¿Cómo puede la IA ayudar a estudiantes con necesidades especiales?",
             "opciones": ["A. Estandarizando actividades", "B. Personalizando los contenidos", "C. Usando textos largos", "D. Aumentando el número de pruebas"],
-            "respuesta": "B",
+            "respuesta": "B. Personalizando los contenidos",
             "explicacion": "La IA permite adaptar materiales a cada necesidad."
         },
         {
@@ -452,6 +452,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
