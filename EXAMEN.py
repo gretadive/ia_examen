@@ -422,11 +422,7 @@ def mostrar_recursos(tema):
         st.write("VER LECTURA")
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
         
-    # Botón para volver a la pantalla anterior
-    if st.button("🔙 Volver"):
-        st.session_state["mostrar"] = None  # Reiniciar la variable de estado
-        st.experimental_rerun()  # Volver a cargar la aplicación
-
+   
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
     st.session_state.setdefault("mostrar", None)
@@ -481,6 +477,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
