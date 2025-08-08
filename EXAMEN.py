@@ -386,12 +386,17 @@ def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
     st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
     
+    # Mostrar video si está disponible
     if "video" in recursos:
-        st.video(recursos["video"]["url"], start_time=0)
+        st.video(recursos["video"]["url"])  # Asegúrate de que el enlace sea accesible
         st.write(f"**{recursos['video']['titulo']}**")
     
+    # Mostrar PDF si está disponible
     if "pdf" in recursos:
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
+
+
+
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
     st.session_state.setdefault("mostrar", None)
@@ -446,6 +451,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
