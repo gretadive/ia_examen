@@ -231,7 +231,8 @@ def format_tiempo(tiempo_total):
     minutos = int((tiempo_total % 3600) // 60)
     segundos = int(tiempo_total % 60)
     return f"{horas}h {minutos}m {segundos}s"
-def generate_pdf(exam_name, questions, answers, score, explanation):
+    
+def generate_html(exam_name, questions, answers, score):
     html_content = f"""
     <html>
     <head>
@@ -258,20 +259,26 @@ def generate_pdf(exam_name, questions, answers, score, explanation):
     </body>
     </html>
     """
-    
     return html_content
 
-def download_pdf(exam_name, questions, answers, score, explanation):
-    html_content = generate_pdf(exam_name, questions, answers, score, explanation)
-    pdf = pdfkit.from_string(html_content, False)
-    with open(f"{exam_name}.pdf", "wb") as f:
-        f.write(pdf)
+def download_html(exam_name, questions, answers, score):
+    html_content = generate_html(exam_name, questions, answers, score)
     st.download_button(
-        label="Descargar examen como PDF",
-        data=pdf,
-        file_name=f"{exam_name}.pdf",
-        mime="application/pdf",
+        label="Descargar examen como HTML",
+        data=html_content,
+        file_name=f"{exam_name}.html",
+        mime="text/html",
     )
+
+# Ejemplo de uso
+if st.button("Generar examen"):
+    questions = [
+        {"pregunta": "¿Cuál es la capital de Francia?", "respuesta": "Paris"},
+        {"pregunta": "¿Cuál es el océano más grande?", "respuesta": "Pacífico"}
+    ]
+    answers = ["Paris", "Pacífico"]
+    score = 2
+    download_html("Examen de Prueba", questions, answers, score)
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -528,6 +535,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
