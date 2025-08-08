@@ -370,10 +370,7 @@ def realizar_refuerzo(tema):
         # Mover el botón FUERA del formulario
         if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
-            # Iniciar el examen del nivel intermedio
-            iniciar_examen("intermedio")
-            st.session_state["mostrar"] = None  # Limpiar el estado de mostrar
-            st.experimental_rerun()  # Reiniciar la aplicación para mostrar el examen
+            st.session_state['refuerzo_aprobado'] = True  # Marcar que se aprobó el refuerzo
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
@@ -383,6 +380,7 @@ def realizar_refuerzo(tema):
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
     st.session_state.setdefault("mostrar", None)
+    st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
 
     if st.session_state["mostrar"] == "refuerzo":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
@@ -410,8 +408,9 @@ def main():
             iniciar_examen("básico")
     with col2:
         if st.button("🟡 Iniciar INTERMEDIO"):
-            if st.session_state.get("puntaje_básico", 0) >= 4:
+            if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state['refuerzo_aprobado']:
                 iniciar_examen("intermedio")
+                st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
             else:
                 st.warning("Debes aprobar el nivel BÁSICO primero.")
     with col3:
@@ -432,6 +431,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
