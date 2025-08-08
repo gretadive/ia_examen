@@ -309,6 +309,7 @@ def realizar_refuerzo(tema):
 
     if 'respuestas_refuerzo' not in st.session_state:
         st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+        
 def realizar_refuerzo(tema):
     subtema = tema
     preguntas_refuerzo = subtemas[subtema]["preguntas"]
@@ -381,15 +382,15 @@ def realizar_refuerzo(tema):
             st.success("🎉 ¡Has aprobado el refuerzo!")
             st.session_state['refuerzo_aprobado'] = True
             st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)  # Limpiar respuestas
-            if st.button("▶️ Continuar al nivel INTERMEDIO"):
-                iniciar_examen("intermedio")  # Esto activa iniciado_intermedio=True
-                st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
-                st.experimental_rerun()  # Reinicia la aplicación para mostrar el nivel intermedio
+            st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
+            st.session_state["iniciado_intermedio"] = False  # Asegúrate de que no esté iniciado
+            st.experimental_rerun()  # Reinicia la aplicación para mostrar la página principal
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
+
 
 
 def mostrar_recursos(tema):
@@ -457,6 +458,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
