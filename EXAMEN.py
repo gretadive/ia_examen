@@ -300,6 +300,7 @@ def examen_nivel(nivel):
                     iniciar_examen("avanzado")
 
 
+
 def realizar_refuerzo(tema):
     subtema = tema
     preguntas_refuerzo = subtemas[subtema]["preguntas"]
@@ -374,15 +375,13 @@ def realizar_refuerzo(tema):
             st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)  # Limpiar respuestas
             st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
             st.session_state["iniciado_intermedio"] = False  # Asegúrate de que no esté iniciado
-            st.session_state["nivel_seleccionado"] = "intermedio"  # O cualquier lógica que necesites
+            st.session_state["nivel_seleccionado"] = "intermedio"  # Indica que el siguiente nivel es intermedio
             return  # Termina la función para que se muestre la página principal
         else:
             st.warning("❌ No aprobaste el refuerzo.")
             if st.button("🔁 Reiniciar refuerzo"):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
-
-
 
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
@@ -396,6 +395,7 @@ def mostrar_recursos(tema):
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
         
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
+
 def main():
     st.session_state.setdefault("mostrar", None)
     st.session_state.setdefault("refuerzo_aprobado", False)  # Inicializar el estado de aprobación del refuerzo
@@ -438,6 +438,11 @@ def main():
             else:
                 st.warning("Debes aprobar el nivel INTERMEDIO primero.")
 
+    # Lógica para iniciar el examen del nivel intermedio si se ha aprobado el refuerzo
+    if st.session_state["nivel_seleccionado"] == "intermedio":
+        iniciar_examen("intermedio")
+        st.session_state["nivel_seleccionado"] = None  # Reiniciar la selección de nivel
+
     if st.session_state["iniciado_básico"]:
         examen_nivel("básico")
     elif st.session_state["iniciado_intermedio"]:
@@ -445,11 +450,11 @@ def main():
     elif st.session_state["iniciado_avanzado"]:
         examen_nivel("avanzado")
 
-
 # -------------------------------
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
