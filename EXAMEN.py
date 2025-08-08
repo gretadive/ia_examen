@@ -260,7 +260,6 @@ def examen_nivel(nivel):
             if respuesta_usuario:
                 respuestas[actual] = respuesta_usuario
                 st.session_state[f'actual_{nivel}'] += 1
-                # No usar rerun aquí, simplemente actualizar el estado
                 st.session_state[f'respuestas_{nivel}'] = respuestas
             else:
                 st.warning("Por favor responde antes de continuar.")
@@ -305,7 +304,6 @@ def examen_nivel(nivel):
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
-
 
 def realizar_refuerzo(tema):
     subtema = tema
@@ -452,6 +450,7 @@ def main():
 # -------------------------------
 if __name__ == "__main__":
     main()
+
 
 
 
