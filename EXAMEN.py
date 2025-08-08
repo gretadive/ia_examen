@@ -389,11 +389,12 @@ def mostrar_recursos(tema):
     # Mostrar video como enlace de texto si está disponible
     if "video" in recursos:
         st.markdown(f"[{recursos['video']['titulo']}]({recursos['video']['url']})")  # Enlace de Zoom
-        st.write("Nota: Este video puede requerir autenticación para acceder.")
+        
     
     # Mostrar PDF si está disponible
     if "pdf" in recursos:
-        st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
+        st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
+       
 
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
@@ -449,6 +450,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
