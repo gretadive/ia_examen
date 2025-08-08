@@ -200,17 +200,6 @@ subtemas = {
 # --------------------------
 # FUNCIONES AUXILIARES
 # --------------------------
-def iniciar_examen(nivel):
-    st.session_state[f'iniciado_{nivel}'] = True
-    for otro in ["básico", "intermedio", "avanzado"]:
-        if otro != nivel:
-            st.session_state[f'iniciado_{otro}'] = False
-    st.session_state[f'preguntas_{nivel}'] = random.sample(niveles[nivel], 5)
-    st.session_state[f'respuestas_{nivel}'] = [None] * 5
-    st.session_state[f'actual_{nivel}'] = 0
-    st.session_state[f'finalizado_{nivel}'] = False
-    st.session_state["mostrar"] = None
-
 def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'iniciado_{nivel}'] = False
     st.session_state[f'finalizado_{nivel}'] = False
@@ -220,6 +209,16 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state["mostrar"] = accion
     st.session_state["nivel_refuerzo"] = nivel
     st.rerun()
+def mostrar_recursos(tema):
+    recursos = subtemas[tema]["recursos"]
+    st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
+    
+    if "video" in recursos:
+        st.video(recursos["video"]["url"], start_time=0)
+        st.write(f"**{recursos['video']['titulo']}**")
+    
+    if "pdf" in recursos:
+        st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -382,6 +381,8 @@ def realizar_refuerzo(tema):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
 
+
+
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
     st.session_state.setdefault("mostrar", None)
@@ -436,3 +437,4 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
