@@ -394,9 +394,9 @@ def main():
     st.session_state.setdefault("mostrar", None)
 
     if st.session_state["mostrar"] == "refuerzo":
-      tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
-      realizar_refuerzo(tema)
-    return
+        tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
+        realizar_refuerzo(tema)
+        return  # Mover el return aquí para que no interrumpa el flujo
 
     if st.session_state["mostrar"] == "recursos":
         tema = st.session_state.get('tema_seleccionado', 'retroalimentación')
@@ -441,6 +441,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
