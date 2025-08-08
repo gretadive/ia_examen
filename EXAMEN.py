@@ -425,10 +425,10 @@ def main():
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("🟢 Iniciar BÁSICO"):
+        if st.button("🔴 Iniciar BÁSICO"):
             iniciar_examen("básico")
     with col2:
-        if st.button("🟡 Iniciar INTERMEDIO"):
+        if st.button("🔴 Iniciar INTERMEDIO"):
             if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state['refuerzo_aprobado']:
                 iniciar_examen("intermedio")
                 st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
@@ -452,6 +452,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
