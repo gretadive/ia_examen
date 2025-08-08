@@ -209,6 +209,7 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state["mostrar"] = accion
     st.session_state["nivel_refuerzo"] = nivel
     st.rerun()
+
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
     st.subheader(f"📚 Recursos para el tema: {tema.upper()}")
@@ -219,6 +220,7 @@ def mostrar_recursos(tema):
     
     if "pdf" in recursos:
         st.markdown(f"[{recursos['pdf']['titulo']}]({recursos['pdf']['url']})")
+
 def iniciar_examen(nivel):
     st.session_state[f'iniciado_{nivel}'] = True
     for otro in ["básico", "intermedio", "avanzado"]:
@@ -229,7 +231,6 @@ def iniciar_examen(nivel):
     st.session_state[f'actual_{nivel}'] = 0
     st.session_state[f'finalizado_{nivel}'] = False
     st.session_state["mostrar"] = None
-
 
 def examen_nivel(nivel):
     preguntas = st.session_state[f'preguntas_{nivel}']
@@ -304,12 +305,10 @@ def examen_nivel(nivel):
         else:
             if nivel == "básico":
                 if st.button("▶️ Continuar a INTERMEDIO"):
-                    iniciar_examen("intermedio")
+                    limpiar_y_redirigir("intermedio", "examen_intermedio")
             elif nivel == "intermedio":
                 if st.button("▶️ Continuar a AVANZADO"):
                     iniciar_examen("avanzado")
-
-
 
 def realizar_refuerzo(tema):
     subtema = tema
@@ -383,8 +382,7 @@ def realizar_refuerzo(tema):
             st.success("🎉 ¡Has aprobado el refuerzo!")
             st.session_state['refuerzo_aprobado'] = True
             if st.button("▶️ Continuar al nivel INTERMEDIO"):
-                iniciar_examen("intermedio")  # Esto activa iniciado_intermedio=True
-                st.session_state["mostrar"] = None  # Quita la pantalla de refuerzo
+                iniciar_examen_intermedio()  # Esto activa iniciado_intermedio=True
                 st.session_state['refuerzo_aprobado'] = False  # Limpia bandera para futuros intentos
                 st.experimental_rerun()
         else:
@@ -392,8 +390,6 @@ def realizar_refuerzo(tema):
             if st.button("🔁 Reiniciar refuerzo"):
                 st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
                 st.experimental_rerun()  # Reiniciar para volver a mostrar el refuerzo
-
-
 
 # En el flujo principal, asegúrate de que el examen del nivel intermedio se muestre correctamente
 def main():
@@ -427,7 +423,7 @@ def main():
     with col2:
         if st.button("🟡 Iniciar INTERMEDIO"):
             if st.session_state.get("puntaje_básico", 0) >= 4 or st.session_state['refuerzo_aprobado']:
-                iniciar_examen("intermedio")
+                iniciar_examen_intermedio()  # Cambiar a iniciar_examen_intermedio
                 st.session_state['refuerzo_aprobado'] = False  # Reiniciar el estado de aprobación
             else:
                 st.warning("Debes aprobar el nivel BÁSICO primero.")
@@ -449,5 +445,3 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
-
-
