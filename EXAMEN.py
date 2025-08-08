@@ -191,7 +191,7 @@ subtemas = {
             },
             "pdf": {
                 "titulo": "Manual de Aprendizaje Adaptativo",
-                "url": "https://example.com/personalizacion.pdf"
+                "url": "https://classroom.google.com/w/NzY0ODQwMTMxNzE5/t/all"
             }
         }
     }
@@ -446,6 +446,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
