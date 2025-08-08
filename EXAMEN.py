@@ -218,6 +218,7 @@ def limpiar_y_redirigir(nivel, accion):
     st.session_state[f'puntaje_{nivel}'] = 0
     st.session_state[f'respuestas_{nivel}'] = [None] * 5
     st.session_state["mostrar"] = accion
+    st.session_state["nivel_refuerzo"] = nivel
     st.rerun()
 
 def examen_nivel(nivel):
@@ -345,13 +346,16 @@ def realizar_refuerzo(tema):
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
         if puntaje < 3:
-            st.warning("📚 Aquí tienes recursos para mejorar:")
-            mostrar_recursos(subtema)
-        else:
             st.success("🎉 ¡Has aprobado el refuerzo!")
-            if st.button("▶️ Volver al inicio"):
-                st.session_state["mostrar"] = None
-                st.rerun()
+            nivel_anterior = st.session_state.get("nivel_refuerzo", None)
+
+            if nivel_anterior == "básico":
+             iniciar_examen("intermedio")
+            elif nivel_anterior == "intermedio":
+             iniciar_examen("avanzado")
+            else:
+             st.session_state["mostrar"] = None
+             st.rerun()
 
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
@@ -417,6 +421,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
