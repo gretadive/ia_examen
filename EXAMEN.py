@@ -350,7 +350,7 @@ def realizar_refuerzo(tema):
                 if any(val in str(r).lower() for val in p["respuesta"]):
                     puntaje += 1
 
-        total_preg = len(preguntas_refuerzo)
+                total_preg = len(preguntas_refuerzo)
         st.subheader(f"📊 Resultado del Refuerzo: {puntaje}/{total_preg}")
 
         for i, p in enumerate(preguntas_refuerzo):
@@ -367,16 +367,18 @@ def realizar_refuerzo(tema):
                 st.error(f"❌ Pregunta {i+1}: Incorrecta")
                 st.info(f"ℹ️ Explicación: {p['explicacion']}")
 
+        # ✅ Mover el botón FUERA del formulario
         if puntaje >= 3:
             st.success("🎉 ¡Has aprobado el refuerzo!")
             if st.button("▶️ Siguiente nivel intermedio"):
-                # 1. Salir del refuerzo
                 st.session_state["mostrar"] = None
-                # 2. Iniciar el nivel intermedio
                 iniciar_examen("intermedio")
-                # 3. Forzar recarga
                 st.rerun()
-                
+        else:
+            st.warning("❌ No aprobaste el refuerzo.")
+            if st.button("🔁 Reiniciar refuerzo"):
+                st.session_state['respuestas_refuerzo'] = [None] * len(preguntas_refuerzo)
+                st.rerun()
 def mostrar_recursos(tema):
     recursos = subtemas[tema]["recursos"]
     st.subheader("📚 Recursos adicionales")
@@ -441,6 +443,7 @@ def main():
 # EJECUTAR APP
 # -------------------------------
 main()
+
 
 
 
